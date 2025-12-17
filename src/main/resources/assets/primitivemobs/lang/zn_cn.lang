@@ -1,0 +1,156 @@
+#Entities
+
+entity.futuristicmobs.chameleon.name=变色龙
+entity.futuristicmobs.treasure_slime.name=宝物史莱姆
+entity.futuristicmobs.haunted_tool.name=活化工具
+entity.futuristicmobs.grovesprite.name=树人
+entity.futuristicmobs.bewitched_tome.name=蕴魔之书
+entity.futuristicmobs.filch_lizard.name=盗蜥
+entity.futuristicmobs.brain_slime.name=嗜脑史莱姆
+entity.futuristicmobs.rocket_creeper.name=火箭爬行者
+entity.futuristicmobs.festive_creeper.name=欢乐爬行者
+entity.futuristicmobs.support_creeper.name=支援爬行者
+entity.futuristicmobs.skeleton_warrior.name=骷髅战士
+entity.futuristicmobs.blazing_juggernaut.name=泰坦烈焰人
+entity.futuristicmobs.lily_lurker.name=河童子
+entity.futuristicmobs.mother_spider.name=母蜘
+entity.futuristicmobs.baby_spider.name=宝贝蜘
+entity.futuristicmobs.trollager.name=巨魔石像
+entity.futuristicmobs.lost_miner.name=矿工
+entity.futuristicmobs.dodo.name=渡渡鸟
+entity.futuristicmobs.mimic.name=宝箱怪
+
+#Items
+
+item.futuristicmobs:camouflage_dye.name=迷彩染料
+item.futuristicmobs:dodo.name=生渡渡鸟肉
+item.futuristicmobs:cooked_dodo.name=烤渡渡鸟肉
+item.futuristicmobs:dodo_egg.name=渡渡鸟蛋
+item.futuristicmobs:mimic_orb.name=宝物球
+item.futuristicmobs:summoner_orb.name=召唤球
+
+#Armor
+
+item.futuristicmobs:camouflage_helmet.name=迷彩头盔
+item.futuristicmobs:camouflage_chestplate.name=迷彩胸甲
+item.futuristicmobs:camouflage_leggings.name=迷彩护腿
+item.futuristicmobs:camouflage_boots.name=迷彩靴子
+
+#Villager Professions
+entity.Villager.futuristicmobs.ore_miner=矿石矿工
+entity.Villager.futuristicmobs.gem_miner=宝石矿工
+entity.Villager.futuristicmobs.stone_miner=采石工
+
+#JER Integration
+JER.catagory.futuristicmobs.mimic_treasure=宝箱怪宝物掉落
+JER.catagory.futuristicmobs.mimic_trap=宝箱怪怪物陷阱掉落
+
+#Old
+
+entity.futuristicmobs.Sheepman.name=Sheepman
+entity.futuristicmobs.Summoner.name=Summoner
+entity.futuristicmobs.Minion.name=Skull Minion
+entity.futuristicmobs.SheepmanSmith.name=Sheepman Smith
+entity.futuristicmobs.Spider+.name=Spider+
+entity.futuristicmobs.OreGolem.name=Ore Golem
+entity.futuristicmobs.BlazeCow.name=Blaze Cow
+entity.futuristicmobs.EnderChicken.name=Ender Chicken
+entity.futuristicmobs.Sheeper.name=Sheeper
+entity.futuristicmobs.Goblin.name=Goblin
+entity.futuristicmobs.BewitchedTomeSpecial.name=Dungeon Bewitched Tome
+entity.futuristicmobs.Wizard.name=Wizard
+
+item.futuristicmobs.SpiderEgg.name=Spider Egg
+item.futuristicmobs.MysteryEgg.name=Mystery Egg
+item.futuristicmobs.SpiderEggShell.name=Spider Egg Shell
+item.futuristicmobs.SkullMinionOrb.name=Skull Minion Orb
+item.futuristicmobs.PreciousPickaxe.name=Precious Pickaxe
+item.futuristicmobs.PreciousAxe.name=Precious Axe
+item.futuristicmobs.TarBall.name=Ball of Tar
+item.futuristicmobs.PinkSlimeBall.name=Pink Slime Ball
+item.futuristicmobs.WebBall.name=Web Ball
+item.futuristicmobs.SmallRock.name=Small Rock
+item.futuristicmobs.WizardTome.name=Wizard Tome
+
+item.futuristicmobs.PetTreasureSlimeSpawner.name=Pet Treasure Slime Spawner
+item.futuristicmobs.PreciousPickaxeSpawner.name=Precious Pickaxe Haunted Tool Spawner
+item.futuristicmobs.RedSkullMinionSpawner.name=Red Skull Minion Spawner
+item.futuristicmobs.BlueSkullMinionSpawner.name=Blue Skull MinionSpawner
+item.futuristicmobs.GreenSkullMinionSpawner.name=Green Skull Minion Spawner
+item.futuristicmobs.YellowSkullMinionSpawner.name=Yellow Skull Minion Spawner
+item.futuristicmobs.MagentaSkullMinionSpawner.name=Magenta Skull Minion Spawner
+item.futuristicmobs.WitherSkullMinionSpawner.name=Wither Skull Minion Spawner
+item.futuristicmobs.SpiderCaveStructureSpawner.name=Spider Cave Spawner
+item.futuristicmobs.GemCaveStructureSpawner.name=Gem Cave Spawner
+item.futuristicmobs.CreeperCaveStructureSpawner.name=Creeper Cave Spawner
+item.futuristicmobs.GoodWizardTowerStructureSpawner.name=Good Wizard Tower Spawner
+item.futuristicmobs.NeutralWizardTowerStructureSpawner.name=Neutral Wizard Tower Spawner
+item.futuristicmobs.EvilWizardTowerStructureSpawner.name=Evil Wizard Tower Spawner
+
+tile.futuristicmobs.Tar.name=Tar
+tile.futuristicmobs.Log.Cinder.name=Cinder Log
+tile.futuristicmobs.Sapling.Cinder.name=Cinder Sapling
+tile.futuristicmobs.Sapling.GroveSprite.name=Grove Sprite Sapling
+tile.futuristicmobs.Leaf.Cinder.name=Cinder Leaves
+tile.futuristicmobs.SpiderEgg.name=Spider Egg
+tile.futuristicmobs.Decorative.WebbedStone.name=Webbed Stone
+tile.futuristicmobs.Planks.Cinder.name=Cinder Planks
+tile.futuristicmobs.Stairs.Cinder.name=Cinder Stairs
+tile.futuristicmobs.Slab.Cinder.name=Cinder Slab
+tile.futuristicmobs.Chest.Spider.name=Webbed Chest
+tile.futuristicmobs.Chest.Gem.name=Gem Chest
+tile.futuristicmobs.BookcaseSpawner.name=Bewitched Tome Spawner
+tile.futuristicmobs.Chest.RandomMimic.name=Chest
+tile.futuristicmobs.Chest.EvilMimic.name=Evil Mimic Chest
+tile.futuristicmobs.Chest.SkeletonWarriorMimic.name=Skeleton Warrior Mimic Chest
+tile.futuristicmobs.Chest.HauntedToolMimic.name=Haunted Tool Mimic Chest
+tile.futuristicmobs.Chest.BatMimic.name=Bat Mimic Chest
+tile.futuristicmobs.Chest.ZombieMimic.name=Zombie Mimic Chest
+tile.futuristicmobs.Chest.ExplosionMimic.name=Explosion Mimic Chest
+tile.futuristicmobs.Chest.EnderMimic.name=Ender Mimic Chest
+tile.futuristicmobs.Chest.Creeper.name=Creepy Chest
+
+key.futuristicmobs.category=futuristicmobs
+key.futuristicmobs.desc=Toggle Camouflage
+
+enchantment.futuristicmobs.stickyFeet=Sticky Feet
+enchantment.futuristicmobs.explosiveSlash=Explosive Slash
+
+achievement.futuristicmobs.lostminerhelp=Forever Alone
+achievement.futuristicmobs.lostminerhelp.desc=Save a Lost Miner
+achievement.futuristicmobs.camouflagedye=Essence of Colors
+achievement.futuristicmobs.camouflagedye.desc=Obtain Camouflage Dye
+achievement.futuristicmobs.camouflagearmor=Chameleon Cosplay
+achievement.futuristicmobs.camouflagearmor.desc=Craft Camouflage armor
+achievement.futuristicmobs.chameleonfriend=Colorful Friend
+achievement.futuristicmobs.chameleonfriend.desc=Tame a Chameleon
+achievement.futuristicmobs.specialcolor1=Color of Exploration
+achievement.futuristicmobs.specialcolor1.desc=Hint: Spores
+achievement.futuristicmobs.specialcolor2=Color of Discovery
+achievement.futuristicmobs.specialcolor2.desc=Hint: Near the end
+achievement.futuristicmobs.specialcolor3=Color of Victory
+achievement.futuristicmobs.specialcolor3.desc=Hint: Inside the beam
+achievement.futuristicmobs.redcreepsurvive=Uninvited Guest
+achievement.futuristicmobs.redcreepsurvive.desc=Slay a Festive Creeper
+achievement.futuristicmobs.spiderowner=Mommy?
+achievement.futuristicmobs.spiderowner.desc=Get your own Baby Spider
+achievement.futuristicmobs.spiderstealer=Child Protection
+achievement.futuristicmobs.spiderstealer.desc=Capture a Baby Spider from a Mother Spider
+achievement.futuristicmobs.spiderattack=Eight Legged Soldier
+achievement.futuristicmobs.spiderattack.desc=Let your Baby Spider atack a mob
+achievement.futuristicmobs.spidergrown=Time Flies By
+achievement.futuristicmobs.spidergrown.desc=Make your Baby Spider grow to adulthood
+achievement.futuristicmobs.haunteddiamond=Evil Sparkle
+achievement.futuristicmobs.haunteddiamond.desc=Slay a Diamond Haunted Tool
+achievement.futuristicmobs.hauntedprecious=My Precious
+achievement.futuristicmobs.hauntedprecious.desc=Slay a Precious Pickaxe Haunted Tool
+achievement.futuristicmobs.mimicfake=Jack in a Box
+achievement.futuristicmobs.mimicfake.desc=Find a Chest Mimic that attacks you
+achievement.futuristicmobs.mimicdungeon=Not So Fake Chest
+achievement.futuristicmobs.mimicdungeon.desc=Find a Chest Mimic that turns into a Dungeon Chest
+achievement.futuristicmobs.treasureslimefriend=Slimy Companion
+achievement.futuristicmobs.treasureslimefriend.desc=Get your own pet Treasure Slime
+achievement.futuristicmobs.treasureslimewhite=Colors Combined
+achievement.futuristicmobs.treasureslimewhite.desc=Make your pet Treasure Slime competely white
+achievement.futuristicmobs.blazingjugger=Follow Me
+achievement.futuristicmobs.blazingjugger.desc=Slay a Blazing Juggernaut by leading it into water

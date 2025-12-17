@@ -1,0 +1,28 @@
+
+entity.futuristicmobs.RocketCreeper.name=Raket Creeper
+entity.futuristicmobs.FestiveCreeper.name=Feestelijke Creeper
+entity.futuristicmobs.SupportCreeper.name=Hulp Creeper
+entity.futuristicmobs.Chameleon.name=Kameleon
+entity.futuristicmobs.TreasureSlime.name=Schat Slijm
+entity.futuristicmobs.HauntedTool.name=Bezeten Gereedschap
+entity.futuristicmobs.MimicChest.name=Mimic Kist
+entity.futuristicmobs.BewitchedTome.name=Behekst Boek
+entity.futuristicmobs.LostMiner.name=Verdwaalde Mijner
+entity.futuristicmobs.BrainSlime.name=Brijn Slijm
+entity.futuristicmobs.SkeletonWarrior.name=Skelet Strijder
+entity.futuristicmobs.MotherSpider.name=Moeder Spin
+entity.futuristicmobs.BabySpider.name=Baby Spin
+entity.futuristicmobs.BlazingJuggernaut.name=Felle Jaggernaut
+entity.futuristicmobs.Sheepman.name=Schaapman
+entity.futuristicmobs.Summoner.name=Monster Oproeper
+entity.futuristicmobs.Minion.name=Schedel Onderling
+entity.futuristicmobs.SheepmanSmith.name=Sheepman Smid
+
+item.futuristicmobs.SpiderEgg.name=Spin Ei
+item.futuristicmobs.MysteryEgg.name=Mysterieus Ei
+item.futuristicmobs.SpiderEggShell.name=Spin Ei Omhulsel
+item.futuristicmobs.CamouflageDye.name=Kamouflage Verf
+item.futuristicmobs.SkullMinionOrb.name=Schedel Onderling Bol
+
+key.futuristicmobs.category=futuristicmobs
+key.futuristicmobs.desc=Schakel Camouflage om

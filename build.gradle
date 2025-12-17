@@ -144,6 +144,14 @@ dependencies {
         testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
+/*
+    deobfCompile "curse.maven:DynamicTrees-252818:3812473"
+    deobfCompile "curse.maven:JER-240630:4440935"
+    deobfCompile "curse.maven:MultiMob-309136:2666556"
+*/
+    implementation rfg.deobf("curse.maven:DynamicTrees-252818:3812473")
+    implementation rfg.deobf("curse.maven:JER-240630:4440935")
+    implementation rfg.deobf("curse.maven:MultiMob-309136:2666556")
 }
 
 apply from: 'gradle/scripts/dependencies.gradle'

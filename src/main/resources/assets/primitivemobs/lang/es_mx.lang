@@ -1,0 +1,176 @@
+#Entities
+
+entity.futuristicmobs.chameleon.name=Camaleon
+entity.futuristicmobs.treasure_slime.name=Slime del Tesoro
+entity.futuristicmobs.haunted_tool.name=Herramienta Encantada
+entity.futuristicmobs.grovesprite.name=Grove Sprite
+entity.futuristicmobs.bewitched_tome.name=Tomo Embrujado
+entity.futuristicmobs.filch_lizard.name=Lagartija Ratera
+entity.futuristicmobs.brain_slime.name=Slime Cerebral
+entity.futuristicmobs.rocket_creeper.name=Creeper Cohete
+entity.futuristicmobs.festive_creeper.name=Creeper Festivo
+entity.futuristicmobs.support_creeper.name=Creeper de Apoyo
+entity.futuristicmobs.skeleton_warrior.name=Esqueleto Guerrero
+entity.futuristicmobs.blazing_juggernaut.name=Juggernaut Ardiente
+entity.futuristicmobs.lily_lurker.name=Lirio Miron
+entity.futuristicmobs.mother_spider.name=Arana Madre
+entity.futuristicmobs.baby_spider.name=Bebe Arana
+entity.futuristicmobs.trollager.name=Trollager
+entity.futuristicmobs.lost_miner.name=Minero Perdido
+entity.futuristicmobs.dodo.name=Dodo
+entity.futuristicmobs.mimic.name=Mimico
+entity.futuristicmobs.goblin.name=Duende
+entity.futuristicmobs.flame_spewer.name=Vomita de Flama
+entity.futuristicmobs.harpy.name=Arpia
+entity.futuristicmobs.sheepman.name=Hombre Oveja
+entity.futuristicmobs.void_eye.name=Ojo de Vacio
+
+#Items
+
+item.futuristicmobs:camouflage_dye.name=Tinte de Camuflaje
+item.futuristicmobs:dodo.name=Carne de Dodo
+item.futuristicmobs:cooked_dodo.name=Carne de Dodo Cocinada
+item.futuristicmobs:dodo_egg.name=Huevo de Dodo
+item.futuristicmobs:mimic_orb.name=Orbe Mimico
+item.futuristicmobs:summoner_orb.name=Orbe Invocador
+item.futuristicmobs:wonder_sap.name=Savia Maravilla
+item.futuristicmobs:spider_egg.name=Huevo de Arana
+item.futuristicmobs:mysteryegg1.name=Huevo Misterioso
+item.futuristicmobs:mysteryegg2.name=Huevo Misterioso
+item.futuristicmobs:mysteryegg3.name=Huevo Misterioso
+item.futuristicmobs:spider_eggshell.name=Cascara de Huevo de Arana
+item.futuristicmobs:goblin_mace.name=Duende Maza
+
+#Armor
+
+item.futuristicmobs:camouflage_helmet.name=Casco de Camuflaje
+item.futuristicmobs:camouflage_chestplate.name=Pechera de Camuflaje
+item.futuristicmobs:camouflage_leggings.name=Pantalones de Camuflaje
+item.futuristicmobs:camouflage_boots.name=Botas de Camuflaje
+
+#Villager Professions
+entity.Villager.futuristicmobs.ore_miner=Minero de Vetas
+entity.Villager.futuristicmobs.gem_miner=Minero de Gemas
+entity.Villager.futuristicmobs.stone_miner=Minero de Piedra
+entity.Villager.futuristicmobs.sheepman_scavenger=Hombre Oveja Carronero
+entity.Villager.futuristicmobs.sheepman_alchemist=Hombre Oveja Alquimista
+entity.Villager.futuristicmobs.sheepman_thief=Hombre Oveja Ladron
+
+#JER Integration
+JER.catagory.futuristicmobs.mimic_treasure=Botin del Tesoro del Mimico
+JER.catagory.futuristicmobs.mimic_trap=Botin de Trampa Mimica
+
+#Tamed
+death.tamed.sitting =%1$s se sento.
+death.tamed.wandering =%1$s vaga.
+death.tamed.following =%1$s ahora te sigue.
+
+#Old
+
+entity.futuristicmobs.Sheepman.name=Hombre Oveja
+entity.futuristicmobs.Summoner.name=Convocador
+entity.futuristicmobs.Minion.name=Craneo Minion
+entity.futuristicmobs.SheepmanSmith.name=Hombre Oveja Herrero
+entity.futuristicmobs.Spider+.name=Arana+
+entity.futuristicmobs.OreGolem.name=Golem de Mineral
+entity.futuristicmobs.BlazeCow.name=Vaca Blaze
+entity.futuristicmobs.EnderChicken.name=Pollo del End
+entity.futuristicmobs.Sheeper.name=Ovejero
+entity.futuristicmobs.Goblin.name=Goblin
+entity.futuristicmobs.BewitchedTomeSpecial.name=Mazmorra del Tomo Embrujado
+entity.futuristicmobs.Wizard.name=Mago
+
+item.futuristicmobs.SpiderEgg.name=Huevo de Arana
+item.futuristicmobs.MysteryEgg.name=Huevo Misterioso
+item.futuristicmobs.SpiderEggShell.name=Cascara de Huevo de Arana
+item.futuristicmobs.SkullMinionOrb.name=Orbe de Craneo Minion
+item.futuristicmobs.PreciousPickaxe.name=Pico Precioso
+item.futuristicmobs.PreciousAxe.name=Hacha Preciosa
+item.futuristicmobs.TarBall.name=Bola de Alquitran
+item.futuristicmobs.PinkSlimeBall.name=Bola de Slime Rosa
+item.futuristicmobs.WebBall.name=Bola de Telarana
+item.futuristicmobs.SmallRock.name=Roca Pequena
+item.futuristicmobs.WizardTome.name=Tomo Embrujado
+
+item.futuristicmobs.PetTreasureSlimeSpawner.name=Invocador de Mascota Slime del Tesoro
+item.futuristicmobs.PreciousPickaxeSpawner.name=Invocador de Pico Precioso Encantado
+item.futuristicmobs.RedSkullMinionSpawner.name=Invocador de Craneo Rojo Minion
+item.futuristicmobs.BlueSkullMinionSpawner.name=Invocador de Craneo Azul Minion
+item.futuristicmobs.GreenSkullMinionSpawner.name=Invocador de Craneo Verde Minion
+item.futuristicmobs.YellowSkullMinionSpawner.name=Invocador de Craneo Amarillo Minion
+item.futuristicmobs.MagentaSkullMinionSpawner.name=Invocador de Craneo Magenta Minion
+item.futuristicmobs.WitherSkullMinionSpawner.name=Invocador de Craneo de Wither Minion
+item.futuristicmobs.SpiderCaveStructureSpawner.name=Invocador de Arana de Cueva
+item.futuristicmobs.GemCaveStructureSpawner.name=Invocador de Gema de Cueva
+item.futuristicmobs.CreeperCaveStructureSpawner.name=Invocador de Creeper de Cueva
+item.futuristicmobs.GoodWizardTowerStructureSpawner.name=Invocador de Torre de Lagartija Buena
+item.futuristicmobs.NeutralWizardTowerStructureSpawner.name=Invocador de Lagartija Neutral
+item.futuristicmobs.EvilWizardTowerStructureSpawner.name=Invocador de Lagartija Malvada
+
+tile.futuristicmobs.Tar.name=Alquitran
+tile.futuristicmobs.Log.Cinder.name=Tronco de Cinder
+tile.futuristicmobs.Sapling.Cinder.name=Retono de Cinder
+tile.futuristicmobs.Sapling.GroveSprite.name=Retono de Grove Sprite
+tile.futuristicmobs.Leaf.Cinder.name=Hojas de Cinder
+tile.futuristicmobs.SpiderEgg.name=Huevo de Arana
+tile.futuristicmobs.Decorative.WebbedStone.name=Piedra Webbed
+tile.futuristicmobs.Planks.Cinder.name=Madera de Cinder
+tile.futuristicmobs.Stairs.Cinder.name=Escaleras de Cinder
+tile.futuristicmobs.Slab.Cinder.name=Losa de Cinder
+tile.futuristicmobs.Chest.Spider.name=Cofre de Webbed
+tile.futuristicmobs.Chest.Gem.name=Cofre de Gema
+tile.futuristicmobs.BookcaseSpawner.name=Invocador de Tomo Embrujado
+tile.futuristicmobs.Chest.RandomMimic.name=Cofre
+tile.futuristicmobs.Chest.EvilMimic.name=Cofre Malvado Mimico
+tile.futuristicmobs.Chest.SkeletonWarriorMimic.name=Esqueleto Guerrero de Cofre Mimico
+tile.futuristicmobs.Chest.HauntedToolMimic.name=Herramienta Encantada de Cofre Mimico
+tile.futuristicmobs.Chest.BatMimic.name=Murcielago de Cofre Mimico
+tile.futuristicmobs.Chest.ZombieMimic.name=Zombi de Cofre Mimico
+tile.futuristicmobs.Chest.ExplosionMimic.name=Explosion de Cofre Mimico
+tile.futuristicmobs.Chest.EnderMimic.name=Ender de Cofre Mimico
+tile.futuristicmobs.Chest.Creeper.name=Creepy de Cofre Mimico
+
+key.futuristicmobs.category=futuristicmobs
+key.futuristicmobs.desc=Alternar Camuflaje
+
+enchantment.futuristicmobs.stickyFeet=Pies Pegajosos
+enchantment.futuristicmobs.explosiveSlash=Barrido Explosivo
+
+achievement.futuristicmobs.lostminerhelp=Forever Alone
+achievement.futuristicmobs.lostminerhelp.desc=Salva un Minero Perdido
+achievement.futuristicmobs.camouflagedye=Esencia de Colores
+achievement.futuristicmobs.camouflagedye.desc=Consigue Tinte de Camuflaje
+achievement.futuristicmobs.camouflagearmor=Cosplay de Camaleon
+achievement.futuristicmobs.camouflagearmor.desc=Crea una Armadura de Camuflaje
+achievement.futuristicmobs.chameleonfriend=Amigo de Todos los Colores
+achievement.futuristicmobs.chameleonfriend.desc=Domestica un Camaleon
+achievement.futuristicmobs.specialcolor1=Color de Exploracion
+achievement.futuristicmobs.specialcolor1.desc=Pista: Esporas
+achievement.futuristicmobs.specialcolor2=Color del Descubrimiento
+achievement.futuristicmobs.specialcolor2.desc=Pista: Cerca del Final
+achievement.futuristicmobs.specialcolor3=Color de la Victoria
+achievement.futuristicmobs.specialcolor3.desc=Pista: Dentro del Haz de Luz
+achievement.futuristicmobs.redcreepsurvive=Invitado No Invitado
+achievement.futuristicmobs.redcreepsurvive.desc=Mata a un Creeper Festivo
+achievement.futuristicmobs.spiderowner=Mami?
+achievement.futuristicmobs.spiderowner.desc=Consigue tu propia Bebe Arana
+achievement.futuristicmobs.spiderstealer=Proteccion Infantil
+achievement.futuristicmobs.spiderstealer.desc=Captura una Bebe Arana de una Mama Arana
+achievement.futuristicmobs.spiderattack=Soldado de ocho patas
+achievement.futuristicmobs.spiderattack.desc=Deja que tu Bebe Arana ataque a un mob
+achievement.futuristicmobs.spidergrown=El Tiempo Vuela
+achievement.futuristicmobs.spidergrown.desc=As que tu Bebe Arana cresca a su edad adulta
+achievement.futuristicmobs.haunteddiamond=Destello Malvado
+achievement.futuristicmobs.haunteddiamond.desc=Mata una Herramienta de Diamante Encantada
+achievement.futuristicmobs.hauntedprecious=Mi Precioso
+achievement.futuristicmobs.hauntedprecious.desc=Mata un Pico Precioso Encantado
+achievement.futuristicmobs.mimicfake=Jack en una Caja
+achievement.futuristicmobs.mimicfake.desc=Encuentra un Cofre Mimico que te ataque
+achievement.futuristicmobs.mimicdungeon=No Es Un Cofre Falso
+achievement.futuristicmobs.mimicdungeon.desc=Encuentra un Cofre Mimico que este en un Cofre de Mazmorra
+achievement.futuristicmobs.treasureslimefriend=Companero Slimy
+achievement.futuristicmobs.treasureslimefriend.desc=Consigue tu propia mascota Slime del Tesoro
+achievement.futuristicmobs.treasureslimewhite=Colores Combinados
+achievement.futuristicmobs.treasureslimewhite.desc=As que tu mascota Slime del Tesoro sea completamente blanca
+achievement.futuristicmobs.blazingjugger=Sigueme
+achievement.futuristicmobs.blazingjugger.desc=As que un Juggernaut Ardiente se meta al agua
