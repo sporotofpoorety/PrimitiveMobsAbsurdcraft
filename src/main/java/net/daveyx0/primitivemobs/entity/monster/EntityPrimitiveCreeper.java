@@ -15,7 +15,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 
-public class EntityPrimitiveCreeper extends EntityCreeperTameable
+public class EntityPrimitiveCreeper extends EntityCreeper
 {
     protected int timeSinceIgnited;
 	private int lastActiveTime;
@@ -361,7 +361,6 @@ public class EntityPrimitiveCreeper extends EntityCreeperTameable
         return this.getGrowingAge() < 0;
     }
 
-    @Override
     public boolean isTamed()
     {
 		ITameableEntity tameable = EntityUtil.getCapability(this, CapabilityTameableEntity.TAMEABLE_ENTITY_CAPABILITY, null);

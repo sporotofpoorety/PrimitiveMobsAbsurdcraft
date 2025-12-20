@@ -22,6 +22,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.ai.EntityAIAvoidEntity;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.EntityAICreeperSwell;
 import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
@@ -234,7 +235,7 @@ public class EntitySupportCreeper extends EntityPrimitiveCreeper {
 				this.tasks.taskEntries.stream().filter(taskEntry -> taskEntry.action instanceof EntityAIAvoidEntity)
 				.findFirst().ifPresent(taskEntry -> this.tasks.removeTask(taskEntry.action));
 			}
-			this.tasks.addTask(2, new EntityAICreeperSwellTameable(this));
+			this.tasks.addTask(2, new EntityAICreeperSwell(this));
     		this.targetTasks.addTask(1, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
     	}
     	super.onUpdate();

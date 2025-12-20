@@ -22,6 +22,7 @@ import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.ai.EntityAIAvoidEntity;
+import net.minecraft.entity.ai.EntityAICreeperSwell;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
@@ -120,7 +121,7 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
     protected void initEntityAI()
     {
         this.tasks.addTask(1, new EntityAISwimming(this));
-        this.tasks.addTask(3, new EntityAICreeperSwellTameable(this));
+        this.tasks.addTask(3, new EntityAICreeperSwell(this));
         this.tasks.addTask(4, new EntityAIAvoidEntity(this, EntityOcelot.class, 6.0F, 1.0D, 1.2D));
         this.tasks.addTask(5, new EntityAIAttackMelee(this, 1.0D, false));
         this.tasks.addTask(6, new EntityAIWander(this, 0.8D));

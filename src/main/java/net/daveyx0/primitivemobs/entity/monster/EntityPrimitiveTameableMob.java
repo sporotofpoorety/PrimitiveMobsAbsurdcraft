@@ -28,7 +28,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EntityPrimitiveTameableMob extends EntityMobTameable {
+public class EntityPrimitiveTameableMob extends EntityMob {
 	
 	 protected static final DataParameter<Byte> TAMED = EntityDataManager.<Byte>createKey(EntityPrimitiveTameableMob.class, DataSerializers.BYTE);
 	    protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(EntityPrimitiveTameableMob.class, DataSerializers.OPTIONAL_UNIQUE_ID);
@@ -47,9 +47,11 @@ public class EntityPrimitiveTameableMob extends EntityMobTameable {
 	        this.dataManager.register(OWNER_UNIQUE_ID, Optional.absent());
 	    }
 
+
 	    /**
 	     * Called to update the entity's position/logic.
 	     */
+/*
         @Override
 	    public void onUpdate()
 	    {
@@ -66,6 +68,7 @@ public class EntityPrimitiveTameableMob extends EntityMobTameable {
                 }
 	        }
 	    }
+*/
 
 	    /**
 	     * (abstract) Protected helper method to write subclass entity data to NBT.
@@ -171,7 +174,6 @@ public class EntityPrimitiveTameableMob extends EntityMobTameable {
 	        }
 	    }
 
-        @Override
 	    public boolean isTamed()
 	    {
 	        return (((Byte)this.dataManager.get(TAMED)).byteValue() & 4) != 0;
