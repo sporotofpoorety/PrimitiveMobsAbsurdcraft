@@ -10,6 +10,9 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 
 public class EntityPrimitiveTNTPrimed extends Entity
 {
@@ -121,6 +124,15 @@ public class EntityPrimitiveTNTPrimed extends Entity
     	boolean flag = this.isDestructive && this.getEntityWorld().getGameRules().getBoolean("mobGriefing");
 
         this.getEntityWorld().createExplosion(this, this.posX, this.posY + (double)(this.height / 16.0F), this.posZ, strength, flag);
+    }
+
+    /**
+     * Return whether this entity should be rendered as on fire.
+     */
+    @SideOnly(Side.CLIENT)
+    public boolean canRenderOnFire()
+    {
+        return false;
     }
 
     /**

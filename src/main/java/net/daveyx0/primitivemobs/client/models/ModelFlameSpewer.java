@@ -59,7 +59,7 @@ public class ModelFlameSpewer extends ModelBase
     EntityFlameSpewer spewer = (EntityFlameSpewer)entityIn;
     GlStateManager.pushMatrix();
 
-	float f = 1 + spewer.getAttackSignal();
+	float f = 1 + spewer.getIrrelevantVariable();
 	GlStateManager.translate(0, -f + 0.9, 0);
     GlStateManager.scale(f, f, f);
     body.render(scale);
@@ -103,7 +103,7 @@ public class ModelFlameSpewer extends ModelBase
     {
         if(offset[i] == 0){offset[i] = (spewer.getRNG().nextFloat() - spewer.getRNG().nextFloat()) + 0.01F;}
         
-        if(spewer.isInDanger())
+        if(spewer.isTouchingGrass())
         {
         	idleTentacle(tentacles[i], (float)spewer.ticksExisted * 0.75F + offset[i], 10F);
         }

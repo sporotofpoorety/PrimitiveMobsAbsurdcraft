@@ -3,6 +3,7 @@ package net.daveyx0.primitivemobs.client.renderer.entity;
 import net.daveyx0.primitivemobs.client.models.ModelPrimitiveCreeper;
 import net.daveyx0.primitivemobs.client.renderer.entity.layer.LayerPrimitiveCreeperCharge;
 import net.daveyx0.primitivemobs.core.PrimitiveMobsReference;
+import net.daveyx0.primitivemobs.core.RotateTowards;
 import net.daveyx0.primitivemobs.entity.monster.EntityFestiveCreeper;
 import net.daveyx0.primitivemobs.entity.monster.EntityPrimitiveCreeper;
 import net.daveyx0.primitivemobs.entity.monster.EntityRocketCreeper;
@@ -11,6 +12,7 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -43,18 +45,39 @@ public class RenderPrimitiveCreeper extends RenderLiving<EntityPrimitiveCreeper>
         
         if(entitylivingbaseIn instanceof EntityRocketCreeper)
         {
-        	EntityRocketCreeper creeper = (EntityRocketCreeper)entitylivingbaseIn;
-        	 if (!creeper.onGround && creeper.isRocket())
- 	         {
- 	            if (creeper.motionY > 0.1D && creeper.motionY < 0.5D)
- 	            {
- 	            	GlStateManager.rotate(25F, -1F, 0.0F, 0.0F);
- 	            }
- 	            else
- 	            {
- 	            	GlStateManager.rotate((float)(creeper.motionY * 175D), -1F, 0.0F, 0.0F);
- 	            }
- 	         }
+            EntityRocketCreeper creeper = (EntityRocketCreeper)entitylivingbaseIn;
+
+    	    if (!creeper.onGround)
+            {
+                if(creeper.isRocket())
+                {
+                    if (creeper.motionY > 0.1D && creeper.motionY < 0.5D)
+                    {
+                	    GlStateManager.rotate(25F, -1F, 0.0F, 0.0F);
+                    }
+                    else
+                    {
+                	    GlStateManager.rotate((float)(creeper.motionY * 175D), -1F, 0.0F, 0.0F);
+                    }
+                }
+            
+                if(creeper.getCreeperHoming())
+                {
+                    if(creeper.motionX != 0 || creeper.motionY != 0 || creeper.motionZ != 0)
+                    {
+                        GlStateManager.rotate(RotateTowards.rotateTowards
+                        (
+                            creeper.getPositionVector(),
+                            new Vec3d
+                            (
+                                creeper.posX + creeper.motionX,
+                                creeper.posY + creeper.motionY,
+                                creeper.posZ + creeper.motionZ
+                            )
+                        ));
+                     }       
+                }
+            }
         }
     }
 

@@ -10,14 +10,17 @@ import net.daveyx0.multimob.entity.IMultiMob;
 import net.daveyx0.multimob.util.EntityUtil;
 import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
 import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
+import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
 import net.daveyx0.primitivemobs.core.TaskUtils;
 import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
-import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellTameable;
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityMob;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAreaEffectCloud;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackMelee;
@@ -40,6 +43,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -49,41 +53,70 @@ import net.minecraft.world.WorldServer;
 
 public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMultiMob {
 
+//Access getters and setters of these mixins
+    public IMixinEntityMob entityMobMixin;
+    public IMixinEntityCreeper rocketCreeperMixin;
+
 	int timeBeforeJumping;
 
-	protected float creeperSpecialExplosionRadius;
-    private boolean creeperSpecialEnabled;
     private int prepareTicks;
+    private int specialHomingTicksStart;
+
+    protected float chargedMultiplier;
+
+    int detonationTimerMax;
+    double detonationDistance;
+    boolean alwaysJumps;
+
+	protected int creeperSpecialExplosionRadius;
+    private boolean creeperSpecialEnabled;
+
     private double specialStartSpeed;
     private double specialCurrentSpeed;
     private double specialAcceleration; 
     private double specialExplodeDistance;
-    private int specialHomingTicksStart;
     private int specialHomingTicksMax;
 
 	public EntityRocketCreeper(World worldIn) {
 		super(worldIn);
-		setRocket(false);
-
-//Rocket Creeper specific
+//Rocket Creeper specific data parameters
+		setCreeperRocket(false);
         setCreeperPreparing(false);
+        setCreeperPreparingIsPastFirstTick(false);
         setCreeperHoming(false);
 
+//Purely state logic
         prepareTicks = 0;
         specialHomingTicksStart = 0;
 
-//New special attack logic fields i added
-        explosionRadius = (float) PrimitiveMobsConfigSpecial.getRocketCreeperExplosionPower();
+
+//Access getters and setters of these mixins
+        entityMobMixin = (IMixinEntityMob) this;
+        rocketCreeperMixin = (IMixinEntityCreeper) this;
+
+        rocketCreeperMixin.setCreeperExplosionRadius(PrimitiveMobsConfigSpecial.getRocketCreeperExplosionPower());
+        this.detonationTimerMax = PrimitiveMobsConfigSpecial.getRocketCreeperDetonationTimerMax();
+        this.detonationDistance = PrimitiveMobsConfigSpecial.getRocketCreeperDetonationDistance();
+        this.alwaysJumps = PrimitiveMobsConfigSpecial.getRocketCreeperAlwaysJump();
+
+        rocketCreeperMixin.setCreeperSpecialCooldown(PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownInitial());
+        rocketCreeperMixin.setCreeperSpecialCooldownInterrupted(PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownInterrupted());
+        rocketCreeperMixin.setCreeperSpecialCooldownAttacked(PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownAttacked());
+        rocketCreeperMixin.setCreeperSpecialCooldownFrustrated(PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownFrustrated());
+        rocketCreeperMixin.setCreeperSpecialCooldownStunned(PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownStunned());
+        rocketCreeperMixin.setCreeperSpecialStunnedDuration(PrimitiveMobsConfigSpecial.getRocketCreeperSpecialStunnedDuration());
+
+        rocketCreeperMixin.setCreeperSpecialIgnitedTimeMax(PrimitiveMobsConfigSpecial.getRocketCreeperSpecialIgnitedTimeMax());
+        rocketCreeperMixin.setCreeperSpecialInterruptedMax(PrimitiveMobsConfigSpecial.getRocketCreeperSpecialInterruptedMax());
+        rocketCreeperMixin.setCreeperSpecialInterruptedDamage((float) PrimitiveMobsConfigSpecial.getRocketCreeperSpecialInterruptedDamage());
+
+
+//Rocket Creeper specific
+        chargedMultiplier = (float) PrimitiveMobsConfigSpecial.getRocketCreeperChargedMultiplier();
+
         creeperSpecialEnabled = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialEnabled();
-        creeperSpecialExplosionRadius = (float) PrimitiveMobsConfigSpecial.getRocketCreeperSpecialExplosionPower();
-        creeperSpecialCooldown = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownInitial();
-        creeperSpecialCooldownInterrupted = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownInterrupted();
-        creeperSpecialCooldownAttacked = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownAttacked();
-        creeperSpecialCooldownFrustrated = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownFrustrated();
-        creeperSpecialCooldownStunned = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialCooldownStunned();
-        creeperSpecialIgnitedTimeMax = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialIgnitedTimeMax();
-        creeperSpecialInterruptedDamage = (float) PrimitiveMobsConfigSpecial.getRocketCreeperSpecialInterruptedDamage();
-        creeperSpecialInterruptedMax = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialInterruptedMax();
+        creeperSpecialExplosionRadius = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialExplosionPower();
+
         specialStartSpeed = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialStartSpeed();
         specialCurrentSpeed = specialStartSpeed;
         specialAcceleration = PrimitiveMobsConfigSpecial.getRocketCreeperSpecialAcceleration();
@@ -143,17 +176,27 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
         compound.setBoolean("Homing", this.getCreeperHoming());
 
 //Avoids overwriting the fields with empty NBT tag values on initial spawn
-        compound.setFloat("ExplosionRadius", this.explosionRadius);
+        compound.setInteger("ExplosionRadius", rocketCreeperMixin.getCreeperExplosionRadius());
+        compound.setInteger("DetonationTimerMax", this.detonationTimerMax);
+        compound.setDouble("DetonationDistance", this.detonationDistance);
+        compound.setBoolean("AlwaysJumps", this.alwaysJumps);
+
+        compound.setInteger("SpecialCooldown", rocketCreeperMixin.getCreeperSpecialCooldown());
+        compound.setInteger("SpecialCooldownInterrupted", rocketCreeperMixin.getCreeperSpecialCooldownInterrupted());
+        compound.setInteger("SpecialCooldownAttacked", rocketCreeperMixin.getCreeperSpecialCooldownAttacked());
+        compound.setInteger("SpecialCooldownFrustrated", rocketCreeperMixin.getCreeperSpecialCooldownFrustrated());
+        compound.setInteger("SpecialCooldownStunned", rocketCreeperMixin.getCreeperSpecialCooldownStunned());
+        compound.setInteger("SpecialStunnedDuration", rocketCreeperMixin.getCreeperSpecialStunnedDuration());
+
+        compound.setInteger("SpecialIgniteMax", rocketCreeperMixin.getCreeperSpecialIgnitedTimeMax());
+        compound.setInteger("SpecialInterruptedMax", rocketCreeperMixin.getCreeperSpecialInterruptedMax());
+        compound.setFloat("SpecialInterruptedDamage", rocketCreeperMixin.getCreeperSpecialInterruptedDamage());
+
+        compound.setFloat("ChargedMultiplier", this.chargedMultiplier);
+
         compound.setBoolean("SpecialEnabled", this.creeperSpecialEnabled);
-        compound.setFloat("SpecialExplosionRadius", this.creeperSpecialExplosionRadius);
-        compound.setInteger("SpecialCooldown", this.creeperSpecialCooldown);
-        compound.setInteger("SpecialCooldownInterrupted", this.creeperSpecialCooldownInterrupted);
-        compound.setInteger("SpecialCooldownAttacked", this.creeperSpecialCooldownAttacked);
-        compound.setInteger("SpecialCooldownFrustrated", this.creeperSpecialCooldownFrustrated);
-        compound.setInteger("SpecialCooldownStunned", this.creeperSpecialCooldownStunned);
-        compound.setInteger("SpecialIgniteMax", this.creeperSpecialIgnitedTimeMax);
-        compound.setFloat("SpecialInterruptedDamage", this.creeperSpecialInterruptedDamage);
-        compound.setInteger("SpecialInterruptedMax", this.creeperSpecialInterruptedMax);
+        compound.setInteger("SpecialExplosionRadius", this.creeperSpecialExplosionRadius);
+
         compound.setDouble("SpecialStartSpeed", this.specialStartSpeed);
         compound.setDouble("SpecialCurrentSpeed", this.specialCurrentSpeed);
         compound.setDouble("SpecialAcceleration", this.specialAcceleration);
@@ -167,21 +210,32 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
     public void readEntityFromNBT(NBTTagCompound compound)
     {
         super.readEntityFromNBT(compound);
-        this.setRocket(compound.getBoolean("Rocket"));
+//Data parameters
+        this.setCreeperRocket(compound.getBoolean("Rocket"));
         if (compound.hasKey("Preparing")) { this.setCreeperPreparing(compound.getBoolean("Preparing")); }
         if (compound.hasKey("Homing")) { this.setCreeperHoming(compound.getBoolean("Homing")); }
 
-        if (compound.hasKey("ExplosionRadius")) { this.explosionRadius = compound.getFloat("ExplosionRadius"); }
+        if (compound.hasKey("ExplosionRadius")) { rocketCreeperMixin.setCreeperExplosionRadius(compound.getInteger("ExplosionRadius")); }
+        if (compound.hasKey("DetonationTimerMax")) { this.detonationTimerMax = compound.getInteger("DetonationTimerMax"); }
+        if (compound.hasKey("DetonationDistance")) { this.detonationDistance = compound.getDouble("DetonationDistance"); }
+        if (compound.hasKey("AlwaysJumps")) { this.alwaysJumps = compound.getBoolean("AlwaysJumps"); }
+
+        if (compound.hasKey("SpecialCooldown")) { rocketCreeperMixin.setCreeperSpecialCooldown(compound.getInteger("SpecialCooldown")); }
+        if (compound.hasKey("SpecialCooldownInterrupted")) { rocketCreeperMixin.setCreeperSpecialCooldownInterrupted(compound.getInteger("SpecialCooldownInterrupted")); }
+        if (compound.hasKey("SpecialCooldownAttacked")) { rocketCreeperMixin.setCreeperSpecialCooldownAttacked(compound.getInteger("SpecialCooldownAttacked")); }
+        if (compound.hasKey("SpecialCooldownFrustrated")) { rocketCreeperMixin.setCreeperSpecialCooldownFrustrated(compound.getInteger("SpecialCooldownFrustrated")); }
+        if (compound.hasKey("SpecialCooldownStunned")) { rocketCreeperMixin.setCreeperSpecialCooldownStunned(compound.getInteger("SpecialCooldownStunned")); }
+        if (compound.hasKey("SpecialStunnedDuration")) { rocketCreeperMixin.setCreeperSpecialStunnedDuration(compound.getInteger("SpecialStunnedDuration")); }
+
+        if (compound.hasKey("SpecialIgniteMax")) { rocketCreeperMixin.setCreeperSpecialIgnitedTimeMax(compound.getInteger("SpecialIgniteMax")); }
+        if (compound.hasKey("SpecialInterruptedDamage")) { rocketCreeperMixin.setCreeperSpecialInterruptedDamage(compound.getFloat("SpecialInterruptedDamage")); }
+        if (compound.hasKey("SpecialInterruptedMax")) { rocketCreeperMixin.setCreeperSpecialInterruptedMax(compound.getInteger("SpecialInterruptedMax")); }
+
+        if (compound.hasKey("ChargedMultiplier")) { this.chargedMultiplier = compound.getFloat("ChargedMultiplier"); }
+
         if (compound.hasKey("SpecialEnabled")) { this.creeperSpecialEnabled = compound.getBoolean("SpecialEnabled"); }
-        if (compound.hasKey("SpecialExplosionRadius")) { this.creeperSpecialExplosionRadius = compound.getFloat("SpecialExplosionRadius"); }
-        if (compound.hasKey("SpecialCooldown")) { this.creeperSpecialCooldown = compound.getInteger("SpecialCooldown"); }
-        if (compound.hasKey("SpecialCooldownInterrupted")) { this.creeperSpecialCooldownInterrupted = compound.getInteger("SpecialCooldownInterrupted"); }
-        if (compound.hasKey("SpecialCooldownAttacked")) { this.creeperSpecialCooldownAttacked = compound.getInteger("SpecialCooldownAttacked"); }
-        if (compound.hasKey("SpecialCooldownFrustrated")) { this.creeperSpecialCooldownFrustrated = compound.getInteger("SpecialCooldownFrustrated"); }
-        if (compound.hasKey("SpecialCooldownStunned")) { this.creeperSpecialCooldownStunned = compound.getInteger("SpecialCooldownStunned"); }
-        if (compound.hasKey("SpecialIgniteMax")) { this.creeperSpecialIgnitedTimeMax = compound.getInteger("SpecialIgniteMax"); }
-        if (compound.hasKey("SpecialInterruptedDamage")) { this.creeperSpecialInterruptedDamage = compound.getFloat("SpecialInterruptedDamage"); }
-        if (compound.hasKey("SpecialInterruptedMax")) { this.creeperSpecialInterruptedMax = compound.getInteger("SpecialInterruptedMax"); }
+        if (compound.hasKey("SpecialExplosionRadius")) { this.creeperSpecialExplosionRadius = compound.getInteger("SpecialExplosionRadius"); }
+
         if (compound.hasKey("SpecialStartSpeed")) { this.specialStartSpeed = compound.getDouble("SpecialStartSpeed"); }
         if (compound.hasKey("SpecialCurrentSpeed")) { this.specialCurrentSpeed = compound.getDouble("SpecialCurrentSpeed"); }
         if (compound.hasKey("SpecialAcceleration")) { this.specialAcceleration = compound.getDouble("SpecialAcceleration"); }
@@ -239,6 +293,8 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
         super.applyEntityAttributes();
 //Was originally 0.35D but it felt a bit too fast
         this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3D);
+//Special attack did nothing with 16 follow range
+        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0D);
     }
     
     protected void entityInit()
@@ -255,64 +311,42 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
     {
     	if(this.isRocket())
     	{
-    		this.explode();
+    		this.explode(rocketCreeperMixin.getCreeperExplosionRadius(), this.chargedMultiplier, true);
     	}
     }
     
-    private void explode()
+    private void explode(int blastRadius, float chargedMult, boolean doesSetDead)
     {
         if (!this.getEntityWorld().isRemote)
         {
             boolean flag = this.getEntityWorld().getGameRules().getBoolean("mobGriefing");
-            float f = (float) (this.getPowered() ? PrimitiveMobsConfigSpecial.getRocketCreeperChargedMultiplier() : 1.0F);
+            float f = (float) (this.getPowered() ? chargedMult : 1.0F);
             
 			ITameableEntity tameable = EntityUtil.getCapability(this, CapabilityTameableEntity.TAMEABLE_ENTITY_CAPABILITY, null);
 			if(tameable != null && tameable.isTamed())
 			{
 	            this.attackEntityFrom(DamageSource.GENERIC, 1);
-	            this.setRocket(false);
+	            this.setCreeperRocket(false);
 			}
 			else
 			{
-				this.dead = true;
-	            this.setDead();
+                if(doesSetDead)
+                {
+				    this.dead = true;
+	                this.setDead();
+                }
 			}
 
-            this.getEntityWorld().createExplosion(this, this.posX, this.posY, this.posZ, (float)this.explosionRadius  * f, flag);
+            this.getEntityWorld().createExplosion(this, this.posX, this.posY, this.posZ, ((float) blastRadius) * f, flag);
 
             this.spawnLingeringCloud();
         }
     }
 
-    private void explodeSpecial()
-    {
-        if (!this.getEntityWorld().isRemote)
-        {
-            boolean flag = this.getEntityWorld().getGameRules().getBoolean("mobGriefing");
-            float f = (float) (this.getPowered() ? PrimitiveMobsConfigSpecial.getRocketCreeperChargedMultiplier() : 1.0F);
-            
-			ITameableEntity tameable = EntityUtil.getCapability(this, CapabilityTameableEntity.TAMEABLE_ENTITY_CAPABILITY, null);
-			if(tameable != null && tameable.isTamed())
-			{
-	            this.attackEntityFrom(DamageSource.GENERIC, 1);
-	            this.setRocket(false);
-			}
-			else
-			{
-				this.dead = true;
-	            this.setDead();
-			}
-
-            this.getEntityWorld().createExplosion(this, this.posX, this.posY, this.posZ, (float)this.creeperSpecialExplosionRadius  * f, flag);
-
-            this.spawnLingeringCloud();
-        }
-    }
-    
     public boolean hasEnoughSpaceToJump(Entity entityIn)
     {
     	boolean flag = true;
-    	if (!PrimitiveMobsConfigSpecial.getRocketCreeperAlwaysJump()) {
+    	if (!this.alwaysJumps) {
 	    	for(int i = 0; i < 5; i++)
 	    	{
 	    		flag = this.world.rayTraceBlocks(new Vec3d(this.posX, this.posY + (double)this.getEyeHeight() + i, this.posZ), new Vec3d(entityIn.posX, entityIn.posY + (double)entityIn.getEyeHeight(), entityIn.posZ), false, true, false) == null;
@@ -324,108 +358,119 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
     public void onUpdate()
     {
         super.onUpdate();
-        //Rocket Creeper specific logic on special explosion
-        if(this.getCreeperStateSpecial() > 0 && this.isRocket() == false)
+//Get target
+        EntityLivingBase rocketCreeperAttackTarget = this.getAttackTarget();
+
+//Rocket Creeper specific logic on special explosion
+        if(rocketCreeperMixin.getCreeperStateSpecial() > 0
+//Special swell task itself already is
+//mutually exclusive with normal swell, but not with isRocket obviously
+        && this.isRocket() == false)
         {
-            //Null protection and reset special attack state if target is gone 
-            if(this.getAttackTarget() != null)
+//Null protection and reset special attack state if target is gone 
+            if(rocketCreeperAttackTarget != null)
             {
                 if(this.getCreeperPreparing() == false && this.getCreeperHoming() == false)
                 {
-                    //Check if it's time to explode...
-                    if(this.creeperSpecialIgnitedTime >= this.creeperSpecialIgnitedTimeMax)
+//Check if it's time to explode...
+                    if(rocketCreeperMixin.getCreeperSpecialIgnitedTime() >= rocketCreeperMixin.getCreeperSpecialIgnitedTimeMax())
                     {
-                        //Then do initial preparation jump
+//Then do initial preparation jump
                         this.setCreeperPreparing(true);
                     }
                 }
-                //This is the initial jump of the special attack
+//This is the initial jump of the special attack
                 else if(this.getCreeperPreparing() == true)
                 {
                     ++prepareTicks;
-                    //On initial jump
+//On initial jump
                     if(!this.getCreeperPreparingIsPastFirstTick())
                     {
-                        //Cancel all motion and gravity
+//Cancel all motion and gravity
                         this.motionX = 0.0D; 
                         this.motionY = 0.0D; 
                         this.motionZ = 0.0D; 
                         this.setNoGravity(true);
-                        //Then jump extremely fast
+//Jump start sound
+                        this.world.playSound(null, 
+                        rocketCreeperAttackTarget.posX, rocketCreeperAttackTarget.posY, rocketCreeperAttackTarget.posZ,
+                        SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.NEUTRAL, 3.0F, 0.5F);
+//Then jump extremely fast
                         this.motionY = 5.0D;
-        		        this.playSound(SoundEvents.ENTITY_FIREWORK_LAUNCH, 3.0F, 0.5F);
                         this.setCreeperPreparingIsPastFirstTick(true);
                     }
-                    //End if already significantly above target or too many ticks
+//End if already significantly above target or too many ticks
                     else if
-                    (this.posY >= (this.getAttackTarget().posY + 10D) || this.prepareTicks >= 200)
+                    (this.posY >= (rocketCreeperAttackTarget.posY + 10D) || this.prepareTicks >= 200)
                     {
                         this.motionX = 0;
                         this.motionY = 0;
                         this.motionZ = 0;
 
-                        //Start homing
+//Start homing
                         this.setCreeperHoming(true);
 
-                        //Get target direction
-                        double dx = this.getAttackTarget().posX - this.posX;
-                        double dy = (this.getAttackTarget().posY + this.getAttackTarget().getEyeHeight() * 0.5D) - this.posY;
-                        double dz = this.getAttackTarget().posZ - this.posZ;
+//Get target direction
+                        double dx = rocketCreeperAttackTarget.posX - this.posX;
+                        double dy = rocketCreeperAttackTarget.posY + (rocketCreeperAttackTarget.getEyeHeight() * 0.5D) - this.posY;
+                        double dz = rocketCreeperAttackTarget.posZ - this.posZ;
 
-                        //Get distance
+//Get distance
                         double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
                         
-                        //Normalize vector
+//Normalize vector
                         if (distance != 0) {
                             dx /= distance;
                             dy /= distance;
                             dz /= distance;
                         }
                     
-                        //Multiply to get the speed
+//Multiply to get the speed
                         this.motionX = (dx * specialStartSpeed); 
                         this.motionY = (dy * specialStartSpeed);
                         this.motionZ = (dz * specialStartSpeed);
 
-                        this.playSound(SoundEvents.ENTITY_FIREWORK_LAUNCH, 3.0F, 0.5F);
+                        this.world.playSound(null, 
+                        rocketCreeperAttackTarget.posX, rocketCreeperAttackTarget.posY, rocketCreeperAttackTarget.posZ,
+                        SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.NEUTRAL, 3.0F, 0.5F);
 
                         this.prepareTicks = 0;
                         this.setCreeperPreparing(false);
                     } 
                 }
-                //This is the homing logic of the special attack 
+//This is the homing logic of the special attack 
                 else if (this.getCreeperHoming() == true)
                 {
-                    //Explodes if homing for too long,
-                    //if collided, or if close enough to target
+//Explodes if homing for too long,
+//if collided, or if close enough to target
                     if((this.specialHomingTicksStart++ >= specialHomingTicksMax)
                     || (this.collidedHorizontally || this.collidedVertically) 
-                    || Math.pow(this.specialExplodeDistance, 2) >= this.getDistanceSq(this.getAttackTarget()))
+                    || Math.pow(this.specialExplodeDistance, 2) >= this.getDistanceSq(rocketCreeperAttackTarget))
                     {
-                        this.explodeSpecial();
+    		            this.explode(this.creeperSpecialExplosionRadius, this.chargedMultiplier, true);
                     }
                     
-                    //Same motion logic but with acceleration
+//Same motion logic but with acceleration
 
-                    //Get target direction
-                    double dx = this.getAttackTarget().posX - this.posX;
-                    double dy = (this.getAttackTarget().posY + this.getAttackTarget().getEyeHeight() * 0.5D) - this.posY;
-                    double dz = this.getAttackTarget().posZ - this.posZ;
+//Get target direction
+                    double dx = rocketCreeperAttackTarget.posX - this.posX;
+                    double dy = (rocketCreeperAttackTarget.posY + rocketCreeperAttackTarget.getEyeHeight() * 0.5D) - this.posY;
+                    double dz = rocketCreeperAttackTarget.posZ - this.posZ;
 
-                    //Get distance
+//Get distance
                     double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
                     
-                    //Normalize vector
+//Normalize vector
                     if (distance != 0) {
                         dx /= distance;
                         dy /= distance;
                         dz /= distance;
                     }
 
-                    //Apply acceleration factor
+//Apply acceleration factor
                     specialCurrentSpeed *= specialAcceleration;
                 
-                    //Multiply to get the speed
+//Multiply to get the speed
                     this.motionX = (dx * specialCurrentSpeed);
                     this.motionY = (dy * specialCurrentSpeed);
                     this.motionZ = (dz * specialCurrentSpeed);
@@ -438,41 +483,51 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
         }
 //Normal explosion logic
         else
-        {    
-            if(this.getAttackTarget() != null )
+        {
+//Do not execute while stunned   
+            if(!entityMobMixin.getAbsurdcraftStunned())
             {
-            	if(this.getDistanceSq(this.getAttackTarget()) > Math.pow(PrimitiveMobsConfigSpecial.getRocketCreeperDetonationDistance(), 2))
-            	{
-            		this.setIgnitedTime(0);
-            		this.setCreeperState(-1);
-            	}
-            }
-            
-        	if(this.getCreeperState() > 0)
-        	{
-        		timeBeforeJumping++;
-        	}else
-        	{
-        		timeBeforeJumping = 0;
-        	}
-
-            if (timeBeforeJumping > PrimitiveMobsConfigSpecial.getRocketCreeperDetonationTimer() && (this.isEntityAlive() && getAttackTarget() != null && this.hasEnoughSpaceToJump(getAttackTarget())))
-            {
-            	this.setIgnitedTime(0);
-                int var1 = this.getCreeperState();
-
-                if (var1 > 0 && onGround)
-                { 
-                	if(getEntityWorld().isRemote)
+//Immediately reset if target goes out of normal explosion range
+                if(rocketCreeperAttackTarget != null )
+                {
+                	if(this.getDistanceSq(rocketCreeperAttackTarget) > Math.pow(this.detonationDistance, 2))
                 	{
-                		getEntityWorld().spawnParticle(EnumParticleTypes.SMOKE_NORMAL, posX + (rand.nextFloat() - rand.nextFloat()), posY - (rand.nextFloat() - rand.nextFloat()) - 1F, posZ + (rand.nextFloat() - rand.nextFloat()), 0, 0, 0);
+          		        this.resetCreeper();
                 	}
-            		this.playSound(SoundEvents.ENTITY_FIREWORK_LAUNCH, 1.0F, 0.5F);
-                    motionY = 1.2000000476837158D;
-                    motionX = (getAttackTarget().posX - posX) / 6D;
-                    motionZ = (getAttackTarget().posZ - posZ) / 6D;
-                    setRocket(true);
                 }
+                
+            	if(this.getCreeperState() > 0)
+            	{
+            		timeBeforeJumping++;
+            	}
+                else
+            	{
+            		timeBeforeJumping = 0;
+            	}
+
+                if (timeBeforeJumping > this.detonationTimerMax && (this.isEntityAlive() && getAttackTarget() != null && this.hasEnoughSpaceToJump(getAttackTarget())))
+                {
+//           	    this.resetCreeper();
+                	rocketCreeperMixin.setCreeperIgnitedTime(0);
+                    int var1 = this.getCreeperState();
+
+                    if (var1 > 0 && onGround)
+                    { 
+                    	if(getEntityWorld().isRemote)
+                    	{
+                    		getEntityWorld().spawnParticle(EnumParticleTypes.SMOKE_NORMAL, posX + (rand.nextFloat() - rand.nextFloat()), posY - (rand.nextFloat() - rand.nextFloat()) - 1F, posZ + (rand.nextFloat() - rand.nextFloat()), 0, 0, 0);
+                    	}
+                		this.playSound(SoundEvents.ENTITY_FIREWORK_LAUNCH, 2.0F, 0.5F);
+                        motionY = 1.2000000476837158D;
+                        motionX = (getAttackTarget().posX - posX) / 6D;
+                        motionZ = (getAttackTarget().posZ - posZ) / 6D;
+                        setCreeperRocket(true);
+                    }
+                }
+            }
+            else
+            {
+                this.resetCreeper();
             }  
         }
     }
@@ -483,7 +538,7 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
         return PrimitiveMobsLootTables.ENTITIES_ROCKETCREEPER;
     }
     
-    public void setRocket(boolean rocket)
+    public void setCreeperRocket(boolean rocket)
     {
         this.getDataManager().set(IS_ROCKET, Boolean.valueOf(rocket));
     }
@@ -522,19 +577,25 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
     }
 
 //Custom one just to make sure it also resets time before jumping
-    @Override
-    public void setIgnitedTime(int time)
+    public void resetCreeper()
     {
-    	this.timeSinceIgnited = time;
-        this.timeBeforeJumping = 0;
+        rocketCreeperMixin.setCreeperIgnitedTime(-10);
+        this.setCreeperState(-1);
+        this.timeBeforeJumping = 0;       
+    }
+
+
+//Make sure it won't do special while rocketing
+    public boolean creeperSpecialConditions()
+    {
+        return !(this.isRocket());
     }
 
 //Reset all special attack logic except cooldown
-    @Override
     public void resetCreeperSpecial()
     {
-        this.creeperSpecialIgnitedTime = 0;
-        this.setCreeperStateSpecial(-1);
+        rocketCreeperMixin.setCreeperSpecialIgnitedTime(0);
+        rocketCreeperMixin.setCreeperStateSpecial(-1);
         this.setCreeperPreparing(false);
         this.setNoGravity(false);
         this.setCreeperPreparingIsPastFirstTick(false);
@@ -544,11 +605,13 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
         this.specialHomingTicksStart = 0;
     }
 
-//Make sure it won't do special while rocketing
-    @Override
-    public boolean creeperSpecialConditions()
+    public void creeperSpecialAttemptSound(double atX, double atY, double atZ)
     {
-        return !(this.isRocket());
+        EntityLivingBase rocketCreeperAttackTarget = this.getAttackTarget();
+
+        this.world.playSound(null, 
+        rocketCreeperAttackTarget.posX, rocketCreeperAttackTarget.posY, rocketCreeperAttackTarget.posZ,
+        PrimitiveMobsSoundEvents.ENTITY_CREEPER_NUKE, SoundCategory.NEUTRAL, 3.0F, 1.0F);
     }
 
 

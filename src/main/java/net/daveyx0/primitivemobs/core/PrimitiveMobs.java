@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = PrimitiveMobsReference.MODID, name = PrimitiveMobsReference.NAME, version = PrimitiveMobsReference.VERSION, acceptedMinecraftVersions = "[1.12]",	
-		guiFactory = "net.daveyx0.primitivemobs.config.PrimitiveMobsFactoryGui", dependencies= "required-after:multimob")
+		guiFactory = "net.daveyx0.primitivemobs.config.PrimitiveMobsFactoryGui", dependencies= "required-after:mixinbooter@[10.1,);required-after:multimob")
 
 public class PrimitiveMobs {
 

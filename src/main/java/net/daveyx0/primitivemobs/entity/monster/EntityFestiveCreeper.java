@@ -8,8 +8,11 @@ import net.daveyx0.multimob.entity.IMultiMob;
 import net.daveyx0.multimob.entity.ai.EntityAIBackOffFromEntity;
 import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
 import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
+import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
 import net.daveyx0.primitivemobs.core.TaskUtils;
+import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
 import net.daveyx0.primitivemobs.entity.item.EntityPrimitiveTNTPrimed;
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -26,7 +29,12 @@ import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 
 public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMultiMob {
@@ -72,6 +80,35 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
     protected int festiveCreeperLineAttackAmountCharged;
     protected double festiveCreeperLineAttackExtentCharged;
 
+//Access getters and setters of EntityCreeper mixin
+    public IMixinEntityCreeper festiveCreeperMixin;
+
+//Festive Creeper specific data parameters
+    private static final DataParameter<Boolean> IS_PARTYING = EntityDataManager.<Boolean>createKey(EntityFestiveCreeper.class, DataSerializers.BOOLEAN);
+
+//Purely state logic
+    int specialCurrentDuration;
+    int specialCurrentInterval;
+    double specialInitialRadians;
+    double specialCurrentRadians;
+
+//Festive Creeper special attack specific
+    boolean festiveCreeperSpecialEnabled;
+    int festiveCreeperSpecialEndTime;
+    int festiveCreeperSpecialInterval;
+    double festiveCreeperSpecialRadianTurns;
+    int festiveCreeperSpecialCooldownOver;
+
+    boolean festiveCreeperSpecialAttackDestructive;
+    float festiveCreeperSpecialAttackPower;
+    double festiveCreeperSpecialAttackExtent;
+    boolean festiveCreeperSpecialAttackDestructiveCharged;
+    float festiveCreeperSpecialAttackPowerCharged;
+    double festiveCreeperSpecialAttackExtentCharged;
+
+
+
+//Constructor
 	public EntityFestiveCreeper(World worldIn) {
 		super(worldIn);
 		isImmuneToFire = true;
@@ -132,7 +169,176 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
         festiveCreeperLineAttack, festiveCreeperLineAttackDestructive, festiveCreeperLineAttackPower, festiveCreeperLineAttackAmount, festiveCreeperLineAttackExtent, 
         festiveCreeperLineAttackCharged, festiveCreeperLineAttackDestructiveCharged, festiveCreeperLineAttackPowerCharged, festiveCreeperLineAttackAmountCharged,
         festiveCreeperLineAttackExtentCharged));
+
+
+
+//Festive Creeper specific data parameters
+		setCreeperPartying(false);
+
+//Purely state logic
+        specialCurrentDuration = 0;
+        specialCurrentInterval = 0;
+        specialInitialRadians = 69420;
+        specialCurrentRadians = 69420;
+
+
+//Access getters and setters of EntityCreeper mixin
+        festiveCreeperMixin = (IMixinEntityCreeper) this;
+
+        festiveCreeperMixin.setCreeperSpecialCooldown(PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialCooldownInitial());
+        festiveCreeperMixin.setCreeperSpecialCooldownInterrupted(PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialCooldownInterrupted());
+        festiveCreeperMixin.setCreeperSpecialCooldownAttacked(PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialCooldownAttacked());
+        festiveCreeperMixin.setCreeperSpecialCooldownFrustrated(PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialCooldownFrustrated());
+        festiveCreeperMixin.setCreeperSpecialCooldownStunned(PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialCooldownStunned());
+        festiveCreeperMixin.setCreeperSpecialStunnedDuration(PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialStunnedDuration());
+
+        festiveCreeperMixin.setCreeperSpecialIgnitedTimeMax(PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialIgnitedTimeMax());
+        festiveCreeperMixin.setCreeperSpecialInterruptedMax(PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialInterruptedMax());
+        festiveCreeperMixin.setCreeperSpecialInterruptedDamage((float) PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialInterruptedDamage());
+
+
+//Festive Creeper special attack specific
+        festiveCreeperSpecialEnabled = PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialEnabled();
+        festiveCreeperSpecialEndTime = PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialEndTime();
+        festiveCreeperSpecialInterval = PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialInterval();
+        festiveCreeperSpecialRadianTurns = PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialRadianTurns();
+        festiveCreeperSpecialCooldownOver = PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialCooldownOver();
+
+        festiveCreeperSpecialAttackDestructive = PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialAttackDestructive();
+        festiveCreeperSpecialAttackPower = (float) PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialAttackPower();
+        festiveCreeperSpecialAttackExtent = PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialAttackExtent();
+        festiveCreeperSpecialAttackDestructiveCharged = PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialAttackDestructiveCharged();
+        festiveCreeperSpecialAttackPowerCharged = (float) PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialAttackPowerCharged();
+        festiveCreeperSpecialAttackExtentCharged = PrimitiveMobsConfigSpecial.getFestiveCreeperSpecialAttackExtentCharged();
+
+
+
+//If task absent
+        if(!TaskUtils.mobHasTask(this, EntityAICreeperSwellSpecial.class))
+        {
+//And task enabled in config
+            if (this.festiveCreeperSpecialEnabled)
+            {
+//Add the task
+                this.tasks.addTask(2, new EntityAICreeperSwellSpecial(this));
+            }
+        }
+//If task is here...
+        else
+        {
+//And task disabled in config
+            if (!this.festiveCreeperSpecialEnabled)
+            {
+//Remove the task
+                TaskUtils.mobRemoveTaskIfPresent(this, EntityAICreeperSwellSpecial.class);
+            }                
+        }
 	}
+
+    protected void entityInit()
+    {
+        super.entityInit();
+        this.getDataManager().register(IS_PARTYING, Boolean.valueOf(false));
+    }
+
+
+
+
+    public void onUpdate()
+    {
+        super.onUpdate();
+//Get target
+        EntityLivingBase festiveCreeperAttackTarget = this.getAttackTarget();
+
+//Festive Creeper specific logic on special attack
+        if(festiveCreeperMixin.getCreeperStateSpecial() > 0)
+        {
+//Null protection and reset special attack state if target is gone 
+            if(festiveCreeperAttackTarget != null)
+            {
+//If attack not already executing
+                if(this.getCreeperPartying() == false)
+                {
+//Check if it's time to do attack...
+                    if(festiveCreeperMixin.getCreeperSpecialIgnitedTime() >= festiveCreeperMixin.getCreeperSpecialIgnitedTimeMax())
+                    {
+//Set necessary logic
+                        specialCurrentInterval = festiveCreeperSpecialInterval;
+                        specialInitialRadians = Math.atan2(festiveCreeperAttackTarget.posX - this.posX, festiveCreeperAttackTarget.posZ - this.posZ);
+                        specialCurrentRadians = specialInitialRadians;
+//Then play sound and start attack
+                        this.world.playSound(null, festiveCreeperAttackTarget.posX, festiveCreeperAttackTarget.posY, festiveCreeperAttackTarget.posZ,
+                        PrimitiveMobsSoundEvents.ENTITY_CREEPER_PARTY, SoundCategory.NEUTRAL, 3.0F, 1.0F);
+                        this.setCreeperPartying(true);
+                    }
+                }
+//This is the initial jump of the special attack
+                else if(this.getCreeperPartying() == true)
+                {
+                    --specialCurrentInterval;
+
+                    if(specialCurrentInterval <= 0)
+                    {
+//Get hypotenuse to the target
+                        double horizontalDistance = 
+                        Math.sqrt(Math.pow(festiveCreeperAttackTarget.posX - this.posX, 2) + Math.pow(festiveCreeperAttackTarget.posZ - this.posZ, 2));
+
+//Get distance fraction (half to full)
+                        double distanceFraction = festiveCreeperSpecialAttackExtent * (double) ((float) 1 - (rand.nextFloat() / 2));
+//Prepare TNT
+                        EntityPrimitiveTNTPrimed tnt = new EntityPrimitiveTNTPrimed(this.getEntityWorld(), this.posX, this.posY, this.posZ, this,
+                            this.festiveCreeperSpecialAttackDestructive, this.festiveCreeperSpecialAttackPower, 30);
+                        tnt.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
+//Use radians sin and cos, and adjusted distance
+                        tnt.motionX = distanceFraction * Math.sin(specialCurrentRadians) * horizontalDistance / 18D;
+                        tnt.motionY = (festiveCreeperAttackTarget.posY - tnt.posY) / 18D + 0.5D;
+                        tnt.motionZ = distanceFraction * Math.cos(specialCurrentRadians) * horizontalDistance / 18D;
+//Spawn TNT
+                        this.getEntityWorld().spawnEntity(tnt);
+
+//Adjust next throw radians (slightly randomized)
+                        specialCurrentRadians += festiveCreeperSpecialRadianTurns * (double) ((float) 1 + (0.25F * (rand.nextFloat() - rand.nextFloat())));
+//Reset interval
+                        specialCurrentInterval = festiveCreeperSpecialInterval;
+                    }
+
+//If duration over
+                    specialCurrentDuration++;
+//Stop attack, reset and apply cooldown
+                    if(specialCurrentDuration >= festiveCreeperSpecialEndTime)
+                    {
+                        this.resetCreeperSpecial();
+                        festiveCreeperMixin.setCreeperSpecialCooldown(festiveCreeperSpecialCooldownOver);
+                    }
+                }
+            }
+//If no target reset state
+            else
+            {
+                this.resetCreeperSpecial();
+            }
+        }
+    }
+
+    /**
+     * Called when the entity is attacked.
+     */
+    public boolean attackEntityFrom(DamageSource source, float amount)
+    {
+		if(source.isExplosion() || source == DamageSource.FALL)
+		{
+			return false;
+		}
+
+        return super.attackEntityFrom(source, amount);
+    }
+
+    public void creeperSpecialAttemptSound(double atX, double atY, double atZ)
+    {
+        this.world.playSound(null, atX, atY, atZ,
+        PrimitiveMobsSoundEvents.ENTITY_CREEPER_ITEMBOX, SoundCategory.NEUTRAL, 3.0F, 1.0F);
+    }
+
 
     protected void initEntityAI()
     {
@@ -195,6 +401,39 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
 	    compound.setDouble("FestiveCreeperLineAttackPowerCharged", this.festiveCreeperLineAttackPowerCharged);
 	    compound.setInteger("FestiveCreeperLineAttackAmountCharged", this.festiveCreeperLineAttackAmountCharged);
 	    compound.setDouble("FestiveCreeperLineAttackExtentCharged", this.festiveCreeperLineAttackExtentCharged);
+
+
+
+        compound.setBoolean("Partying", this.getCreeperPartying());
+
+	    compound.setInteger("FestiveCreeperSpecialCurrentDuration", this.specialCurrentDuration);
+	    compound.setInteger("FestiveCreeperSpecialCurrentInterval", this.specialCurrentInterval);
+	    compound.setDouble("FestiveCreeperSpecialInitialRadians", this.specialInitialRadians);
+	    compound.setDouble("FestiveCreeperSpecialCurrentRadians", this.specialCurrentRadians);
+
+        compound.setInteger("SpecialCooldown", festiveCreeperMixin.getCreeperSpecialCooldown());
+        compound.setInteger("SpecialCooldownInterrupted", festiveCreeperMixin.getCreeperSpecialCooldownInterrupted());
+        compound.setInteger("SpecialCooldownAttacked", festiveCreeperMixin.getCreeperSpecialCooldownAttacked());
+        compound.setInteger("SpecialCooldownFrustrated", festiveCreeperMixin.getCreeperSpecialCooldownFrustrated());
+        compound.setInteger("SpecialCooldownStunned", festiveCreeperMixin.getCreeperSpecialCooldownStunned());
+        compound.setInteger("SpecialStunnedDuration", festiveCreeperMixin.getCreeperSpecialStunnedDuration());
+
+        compound.setInteger("SpecialIgniteMax", festiveCreeperMixin.getCreeperSpecialIgnitedTimeMax());
+        compound.setInteger("SpecialInterruptedMax", festiveCreeperMixin.getCreeperSpecialInterruptedMax());
+        compound.setFloat("SpecialInterruptedDamage", festiveCreeperMixin.getCreeperSpecialInterruptedDamage());
+
+        compound.setBoolean("FestiveCreeperSpecialEnabled", this.festiveCreeperSpecialEnabled);
+	    compound.setInteger("FestiveCreeperSpecialEndTime", this.festiveCreeperSpecialEndTime);
+	    compound.setInteger("FestiveCreeperSpecialInterval", this.festiveCreeperSpecialInterval);
+	    compound.setDouble("FestiveCreeperSpecialRadianTurns", this.festiveCreeperSpecialRadianTurns);
+	    compound.setInteger("FestiveCreeperSpecialCooldownOver", this.festiveCreeperSpecialCooldownOver);
+
+	    compound.setBoolean("FestiveCreeperSpecialAttackDestructive", this.festiveCreeperSpecialAttackDestructive);
+	    compound.setDouble("FestiveCreeperSpecialAttackPower", (double) this.festiveCreeperSpecialAttackPower);
+	    compound.setDouble("FestiveCreeperSpecialAttackExtent", this.festiveCreeperSpecialAttackExtent);
+	    compound.setBoolean("FestiveCreeperSpecialAttackDestructiveCharged", this.festiveCreeperSpecialAttackDestructiveCharged);
+	    compound.setDouble("FestiveCreeperSpecialAttackPowerCharged", (double) this.festiveCreeperSpecialAttackPowerCharged);
+	    compound.setDouble("FestiveCreeperSpecialAttackExtentCharged", this.festiveCreeperSpecialAttackExtentCharged);
     }
 
     /**
@@ -221,11 +460,11 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
         if (compound.hasKey("FestiveCreeperRingAttackAmount")) { this.festiveCreeperRingAttackAmount = compound.getInteger("FestiveCreeperRingAttackAmount"); }
         if (compound.hasKey("FestiveCreeperRingAttackCharged")) { this.festiveCreeperRingAttackCharged = compound.getBoolean("FestiveCreeperRingAttackCharged"); }
         if (compound.hasKey("FestiveCreeperRingAttackDestructiveCharged")) { this.festiveCreeperRingAttackDestructiveCharged 
-        = compound.getBoolean("FestiveCreeperRingAttackDestructiveCharged"); }
+            = compound.getBoolean("FestiveCreeperRingAttackDestructiveCharged"); }
         if (compound.hasKey("FestiveCreeperRingAttackPowerCharged")) { this.festiveCreeperRingAttackPowerCharged 
-        = compound.getDouble("FestiveCreeperRingAttackPowerCharged"); }
+            = compound.getDouble("FestiveCreeperRingAttackPowerCharged"); }
         if (compound.hasKey("FestiveCreeperRingAttackAmountCharged")) { this.festiveCreeperRingAttackAmountCharged 
-        = compound.getInteger("FestiveCreeperRingAttackAmountCharged"); }
+            = compound.getInteger("FestiveCreeperRingAttackAmountCharged"); }
 
         if (compound.hasKey("FestiveCreeperCrossAttack")) { this.festiveCreeperCrossAttack = compound.getBoolean("FestiveCreeperCrossAttack"); }
         if (compound.hasKey("FestiveCreeperCrossAttackDestructive")) { this.festiveCreeperCrossAttackDestructive = compound.getBoolean("FestiveCreeperCrossAttackDestructive"); }
@@ -234,13 +473,13 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
         if (compound.hasKey("FestiveCreeperCrossAttackExtent")) { this.festiveCreeperCrossAttackExtent = compound.getDouble("FestiveCreeperCrossAttackExtent"); }
         if (compound.hasKey("FestiveCreeperCrossAttackCharged")) { this.festiveCreeperCrossAttackCharged = compound.getBoolean("FestiveCreeperCrossAttackCharged"); }
         if (compound.hasKey("FestiveCreeperCrossAttackDestructiveCharged")) { this.festiveCreeperCrossAttackDestructiveCharged 
-        = compound.getBoolean("FestiveCreeperCrossAttackDestructiveCharged"); }
+            = compound.getBoolean("FestiveCreeperCrossAttackDestructiveCharged"); }
         if (compound.hasKey("FestiveCreeperCrossAttackPowerCharged")) { this.festiveCreeperCrossAttackPowerCharged 
-        = compound.getDouble("FestiveCreeperCrossAttackPowerCharged"); }
+            = compound.getDouble("FestiveCreeperCrossAttackPowerCharged"); }
         if (compound.hasKey("FestiveCreeperCrossAttackAmountCharged")) { this.festiveCreeperCrossAttackAmountCharged 
-        = compound.getInteger("FestiveCreeperCrossAttackAmountCharged"); }
+            = compound.getInteger("FestiveCreeperCrossAttackAmountCharged"); }
         if (compound.hasKey("FestiveCreeperCrossAttackExtentCharged")) { this.festiveCreeperCrossAttackExtentCharged 
-        = compound.getDouble("FestiveCreeperCrossAttackExtentCharged"); }
+            = compound.getDouble("FestiveCreeperCrossAttackExtentCharged"); }
 
         if (compound.hasKey("FestiveCreeperLineAttack")) { this.festiveCreeperLineAttack = compound.getBoolean("FestiveCreeperLineAttack"); }
         if (compound.hasKey("FestiveCreeperLineAttackDestructive")) { this.festiveCreeperLineAttackDestructive = compound.getBoolean("FestiveCreeperLineAttackDestructive"); }
@@ -249,13 +488,13 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
         if (compound.hasKey("FestiveCreeperLineAttackExtent")) { this.festiveCreeperLineAttackExtent = compound.getDouble("FestiveCreeperLineAttackExtent"); }
         if (compound.hasKey("FestiveCreeperLineAttackCharged")) { this.festiveCreeperLineAttackCharged = compound.getBoolean("FestiveCreeperLineAttackCharged"); }
         if (compound.hasKey("FestiveCreeperLineAttackDestructiveCharged")) { this.festiveCreeperLineAttackDestructiveCharged 
-        = compound.getBoolean("FestiveCreeperLineAttackDestructiveCharged"); }
+            = compound.getBoolean("FestiveCreeperLineAttackDestructiveCharged"); }
         if (compound.hasKey("FestiveCreeperLineAttackPowerCharged")) { this.festiveCreeperLineAttackPowerCharged 
-        = compound.getDouble("FestiveCreeperLineAttackPowerCharged"); }
+            = compound.getDouble("FestiveCreeperLineAttackPowerCharged"); }
         if (compound.hasKey("FestiveCreeperLineAttackAmountCharged")) { this.festiveCreeperLineAttackAmountCharged 
-        = compound.getInteger("FestiveCreeperLineAttackAmountCharged"); }
+            = compound.getInteger("FestiveCreeperLineAttackAmountCharged"); }
         if (compound.hasKey("FestiveCreeperLineAttackExtentCharged")) { this.festiveCreeperLineAttackExtentCharged 
-        = compound.getDouble("FestiveCreeperLineAttackExtentCharged"); }
+            = compound.getDouble("FestiveCreeperLineAttackExtentCharged"); }
 
 //Add task if absent
         if(!TaskUtils.mobHasTask(this, EntityAIBackOffFromEntity.class))
@@ -307,6 +546,54 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
             festiveCreeperLineAttack, festiveCreeperLineAttackDestructive, festiveCreeperLineAttackPower, festiveCreeperLineAttackAmount, festiveCreeperLineAttackExtent, 
             festiveCreeperLineAttackCharged, festiveCreeperLineAttackDestructiveCharged, festiveCreeperLineAttackPowerCharged, festiveCreeperLineAttackAmountCharged,
             festiveCreeperLineAttackExtentCharged));
+        }
+
+
+        if (compound.hasKey("Partying")) { this.setCreeperPartying(compound.getBoolean("Partying")); }
+
+
+        if (compound.hasKey("FestiveCreeperSpecialCurrentDuration")) { this.specialCurrentDuration = compound.getInteger("FestiveCreeperSpecialCurrentDuration"); }
+        if (compound.hasKey("FestiveCreeperSpecialCurrentInterval")) { this.specialCurrentInterval = compound.getInteger("FestiveCreeperSpecialCurrentInterval"); }
+        if (compound.hasKey("FestiveCreeperSpecialInitialRadians")) { this.specialInitialRadians = compound.getDouble("FestiveCreeperSpecialInitialRadians"); }
+        if (compound.hasKey("FestiveCreeperSpecialCurrentRadians")) { this.specialCurrentRadians = compound.getDouble("FestiveCreeperSpecialCurrentRadians"); }
+
+        if (compound.hasKey("SpecialCooldown")) { festiveCreeperMixin.setCreeperSpecialCooldown(compound.getInteger("SpecialCooldown")); }
+        if (compound.hasKey("SpecialCooldownInterrupted")) { festiveCreeperMixin.setCreeperSpecialCooldownInterrupted(compound.getInteger("SpecialCooldownInterrupted")); }
+        if (compound.hasKey("SpecialCooldownAttacked")) { festiveCreeperMixin.setCreeperSpecialCooldownAttacked(compound.getInteger("SpecialCooldownAttacked")); }
+        if (compound.hasKey("SpecialCooldownFrustrated")) { festiveCreeperMixin.setCreeperSpecialCooldownFrustrated(compound.getInteger("SpecialCooldownFrustrated")); }
+        if (compound.hasKey("SpecialCooldownStunned")) { festiveCreeperMixin.setCreeperSpecialCooldownStunned(compound.getInteger("SpecialCooldownStunned")); }
+        if (compound.hasKey("SpecialStunnedDuration")) { festiveCreeperMixin.setCreeperSpecialStunnedDuration(compound.getInteger("SpecialStunnedDuration")); }
+
+        if (compound.hasKey("SpecialIgniteMax")) { festiveCreeperMixin.setCreeperSpecialIgnitedTimeMax(compound.getInteger("SpecialIgniteMax")); }
+        if (compound.hasKey("SpecialInterruptedDamage")) { festiveCreeperMixin.setCreeperSpecialInterruptedDamage(compound.getFloat("SpecialInterruptedDamage")); }
+        if (compound.hasKey("SpecialInterruptedMax")) { festiveCreeperMixin.setCreeperSpecialInterruptedMax(compound.getInteger("SpecialInterruptedMax")); }
+
+        if (compound.hasKey("FestiveCreeperSpecialEnabled")) { this.festiveCreeperSpecialEnabled = compound.getBoolean("FestiveCreeperSpecialEnabled"); }
+        if (compound.hasKey("FestiveCreeperSpecialEndTime")) { this.festiveCreeperSpecialEndTime = compound.getInteger("FestiveCreeperSpecialEndTime"); }
+        if (compound.hasKey("FestiveCreeperSpecialInterval")) { this.festiveCreeperSpecialInterval = compound.getInteger("FestiveCreeperSpecialInterval"); }
+        if (compound.hasKey("FestiveCreeperSpecialRadianTurns")) { this.festiveCreeperSpecialRadianTurns = compound.getDouble("FestiveCreeperSpecialRadianTurns"); }
+        if (compound.hasKey("FestiveCreeperSpecialCooldownOver")) { this.festiveCreeperSpecialCooldownOver 
+            = compound.getInteger("FestiveCreeperSpecialCooldownOver"); }
+
+        if (compound.hasKey("FestiveCreeperSpecialAttackDestructive")) 
+            { this.festiveCreeperSpecialAttackDestructive = compound.getBoolean("FestiveCreeperSpecialAttackDestructive"); }
+        if (compound.hasKey("FestiveCreeperSpecialAttackPower")) { this.festiveCreeperSpecialAttackPower = (float) compound.getDouble("FestiveCreeperSpecialAttackPower"); }
+        if (compound.hasKey("FestiveCreeperSpecialAttackExtent")) { this.festiveCreeperSpecialAttackExtent = compound.getDouble("FestiveCreeperSpecialAttackExtent"); }
+        if (compound.hasKey("FestiveCreeperSpecialAttackDestructiveCharged")) 
+            { this.festiveCreeperSpecialAttackDestructiveCharged = compound.getBoolean("FestiveCreeperSpecialAttackDestructiveCharged"); }
+        if (compound.hasKey("FestiveCreeperSpecialAttackPowerCharged")) 
+            { this.festiveCreeperSpecialAttackPowerCharged = (float) compound.getDouble("FestiveCreeperSpecialAttackPowerCharged"); }
+        if (compound.hasKey("FestiveCreeperSpecialAttackExtentCharged")) 
+            { this.festiveCreeperSpecialAttackExtentCharged = compound.getDouble("FestiveCreeperSpecialAttackExtentCharged"); }
+
+
+
+//Remove task if present, and 
+        TaskUtils.mobRemoveTaskIfPresent(this, EntityAICreeperSwellSpecial.class);
+//Only reassign if enabled in NBT, NBT values can also override config ones
+        if (this.festiveCreeperSpecialEnabled) 
+        {
+            this.tasks.addTask(2, new EntityAICreeperSwellSpecial(this));
         }
     }
     
@@ -436,6 +723,12 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
 		*/
 		public boolean shouldExecute()
 		{
+
+            if(festiveCreeperMixin.getCreeperStateSpecial() > 0 && !this.creeper.getCreeperPartying())
+            {
+                return false;
+            }
+        
 	        target = this.creeper.getAttackTarget();
 
 	        if (target == null)
@@ -632,7 +925,33 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
             }  
         }
     }
+
+
+    public boolean getCreeperPartying()
+    {
+        return ((Boolean)this.dataManager.get(IS_PARTYING)).booleanValue();
+    }
+
+    public void setCreeperPartying(boolean partying)
+    {
+        this.getDataManager().set(IS_PARTYING, Boolean.valueOf(partying));
+    }
+
+
+//Reset all special attack logic except cooldown
+    public void resetCreeperSpecial()
+    {
+        festiveCreeperMixin.setCreeperSpecialIgnitedTime(0);
+        festiveCreeperMixin.setCreeperStateSpecial(-1);
+        this.setCreeperPartying(false);
+
+        specialCurrentDuration = 0;
+        specialCurrentInterval = 0;
+        specialInitialRadians = 69420;
+        specialCurrentRadians = 69420;
+    }
     
+
     @Nullable
     protected ResourceLocation getLootTable()
     {

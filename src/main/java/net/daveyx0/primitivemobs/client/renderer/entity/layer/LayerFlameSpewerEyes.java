@@ -26,7 +26,7 @@ public class LayerFlameSpewerEyes implements LayerRenderer<EntityFlameSpewer>
     public void doRenderLayer(EntityFlameSpewer spewer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {   
     	GlStateManager.enableBlend();
-    	GlStateManager.color(1, 1, 1, (10f - spewer.getAttackTime())/10f);
+    	GlStateManager.color(1, 1, 1, (10f - spewer.getNextActionCountdown())/10f);
         this.model.setModelAttributes(this.renderer.getMainModel());
         this.renderer.bindTexture(FLAMESPEWER_EYES_TEXTURES);
         this.model.render(spewer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);

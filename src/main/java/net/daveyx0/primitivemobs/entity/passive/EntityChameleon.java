@@ -38,6 +38,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -192,6 +193,20 @@ public class EntityChameleon extends EntityAnimal implements IMultiMobPassive
         
         this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
         this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.20000000298023224D);
+    }
+
+    /**
+     * Called when the entity is attacked.
+     */
+    public boolean attackEntityFrom(DamageSource source, float amount)
+    {
+		if(source == DamageSource.FIREWORKS || source == DamageSource.IN_WALL 
+        || source == DamageSource.FALL || source == DamageSource.DROWN || source == DamageSource.CACTUS)
+		{
+			return false;
+		}
+
+        return super.attackEntityFrom(source, amount);
     }
    
     

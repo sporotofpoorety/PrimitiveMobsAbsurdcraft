@@ -172,5 +172,21 @@
         [
             "primitivemobs:entity/creeper/nuke"
         ]
+    },
+    "entity.creeper.itembox":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "primitivemobs:entity/creeper/itembox"
+        ]
+    },
+    "entity.creeper.party":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "primitivemobs:entity/creeper/party"
+        ]
     }
 }

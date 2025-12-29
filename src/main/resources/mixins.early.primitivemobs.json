@@ -1,0 +1,15 @@
+{
+	"package": "net.daveyx0.primitivemobs.mixins",
+	"required": true,
+	"refmap": "mixins.primitivemobs.refmap.json",
+	"target": "@env(DEFAULT)",
+	"minVersion": "0.8.5",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+        "MixinEntityCreeper",
+        "MixinEntityLiving",
+        "MixinEntityMob"
+    ],
+	"server": [],
+	"client": []
+}

@@ -7,6 +7,7 @@ import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigMobs;
 import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
 import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
 import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
+import net.daveyx0.primitivemobs.entity.item.EntityFlameSpitBurst;
 import net.daveyx0.primitivemobs.entity.ai.EntityAIFollowerHurtByTarget;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -84,6 +85,28 @@ public class EntityMotherSpider extends EntityPrimitiveSpider implements IMultiM
 	public void onUpdate()
 	{
 		super.onUpdate();
+
+        if(this.getAttackTarget() != null)
+        {
+            if(this.ticksExisted % 100 == 0)
+            {
+//Please fkn work this is literally copypasted from the flame spewer
+                EntityLivingBase testTarget = this.getAttackTarget();
+
+                double targetDistX = testTarget.posX - this.posX;
+                double targetDistY = 
+                testTarget.getEntityBoundingBox().minY + (double)(testTarget.height / 2.0F + 0.25f) - (this.posY + (double)(this.height / 2.0F));
+                double targetDistZ = testTarget.posZ - this.posZ;
+                double targetDistance = this.getDistanceSq(testTarget);
+
+                float angleAttenuate = MathHelper.sqrt(MathHelper.sqrt(targetDistance) * 0.1F);
+
+                EntityFlameSpitBurst fireBomb = new EntityFlameSpitBurst(this.world, this, 30, 10, targetDistX + this.getRNG().nextGaussian() * 0.002 * angleAttenuate, targetDistY - this.getRNG().nextGaussian() * 0.002 * angleAttenuate, targetDistZ  + this.getRNG().nextGaussian() * 0.002 * angleAttenuate, 100, 10, 256);
+                fireBomb.posY = this.posY + (double)(this.height / 2.0F) + 0.5F;
+
+                this.world.spawnEntity(fireBomb);
+            }
+        }
 		
 		if(!this.getPassengers().isEmpty())
 		{

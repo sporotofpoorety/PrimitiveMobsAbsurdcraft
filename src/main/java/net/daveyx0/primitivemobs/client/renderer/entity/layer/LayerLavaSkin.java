@@ -57,7 +57,7 @@ public class LayerLavaSkin  implements LayerRenderer<EntityLiving> {
             GlStateManager.depthMask(true);
         }
         GlStateManager.enableBlend();
-        GlStateManager.color(1, 1, 1, (10f - spewer.getAttackTime())/10f);
+        GlStateManager.color(1, 1, 1, (10f - spewer.getNextActionCountdown())/10f);
 		this.lavaModel.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         GlStateManager.disableBlend();
         GlStateManager.matrixMode(5890);

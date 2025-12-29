@@ -1,8 +1,8 @@
 package net.daveyx0.primitivemobs.entity.ai;
 
-
 import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.entity.monster.EntityPrimitiveCreeper;
+import net.daveyx0.primitivemobs.entity.EntityFireSpiral;
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.monster.EntityCreeper;
@@ -11,16 +11,18 @@ import net.minecraft.util.SoundCategory;
 public class EntityAICreeperSwellSpecial extends EntityAIBase
 {
     /** The creeper that is swelling. */
-    EntityPrimitiveCreeper swellingCreeper;
+    EntityCreeper swellingCreeper;
+    IMixinEntityCreeper swellingCreeperMixin;
 
     /**
      * The creeper's attack target. This is used for the changing of the creeper's state.
      */
     EntityLivingBase creeperAttackTarget;
 
-    public EntityAICreeperSwellSpecial(EntityPrimitiveCreeper entityprimitivecreeperIn)
+    public EntityAICreeperSwellSpecial(EntityCreeper entityCreeperIn)
     {
-        this.swellingCreeper = entityprimitivecreeperIn;
+        this.swellingCreeper = entityCreeperIn;
+        this.swellingCreeperMixin = (IMixinEntityCreeper) this.swellingCreeper;
         this.setMutexBits(1);
     }
 
@@ -29,13 +31,16 @@ public class EntityAICreeperSwellSpecial extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-        //First, needs cooldown to be expired
-        //and needs to not already be executing normal swell
-        if(this.swellingCreeper.getCreeperSpecialCooldown() <= 0 && this.swellingCreeper.getCreeperState() < 1 && this.swellingCreeper.creeperSpecialConditions() == true)
+//First, needs cooldown to be expired
+//and needs to not already be executing normal swell
+        if(this.swellingCreeperMixin.getCreeperSpecialCooldown() <= 0 
+        && this.swellingCreeper.getCreeperState() < 1
+        && this.swellingCreeperMixin.getCreeperIgnitedTime() <= 0 
+        && this.swellingCreeperMixin.creeperSpecialConditions() == true)
         {
             EntityLivingBase entitylivingbase = this.swellingCreeper.getAttackTarget();
-            //Executes if is already swelling or can see target
-            return (this.swellingCreeper.getCreeperStateSpecial() > 0) || (entitylivingbase != null && this.swellingCreeper.canEntityBeSeen(entitylivingbase));
+//Executes if is already swelling or can see target
+            return (this.swellingCreeperMixin.getCreeperStateSpecial() > 0) || (entitylivingbase != null && this.swellingCreeper.canEntityBeSeen(entitylivingbase));
         }
         return false;
     }
@@ -53,16 +58,22 @@ public class EntityAICreeperSwellSpecial extends EntityAIBase
      */
     public void startExecuting()
     {
-        //Clear current pathfinding route
+//Clear current pathfinding route
         this.swellingCreeper.getNavigator().clearPath();
-        //Get attack target
+//Get attack target
         this.creeperAttackTarget = this.swellingCreeper.getAttackTarget();
-        //Also, first cancel regular swelling
-        this.swellingCreeper.resetCreeperSpecial();
-        this.swellingCreeper.setIgnitedTime(0);
-//      this.swellingCreeper.playSound(PrimitiveMobsSoundEvents.ENTITY_CREEPER_NUKE, 3.0F, 1.0F);
-        this.swellingCreeper.world.playSound(null, this.swellingCreeper.posX, this.swellingCreeper.posY, this.swellingCreeper.posZ,
-                                            PrimitiveMobsSoundEvents.ENTITY_CREEPER_NUKE, SoundCategory.NEUTRAL, 5.0F, 1.0F);
+
+//If target null
+        if(creeperAttackTarget != null)
+        {
+//Play sound
+            this.swellingCreeperMixin.creeperSpecialAttemptSound(this.creeperAttackTarget.posX, this.creeperAttackTarget.posY, this.creeperAttackTarget.posZ);
+//Do fire spiral
+		    EntityFireSpiral fireSpiral = new EntityFireSpiral(this.swellingCreeper.getEntityWorld(), 
+                this.swellingCreeper.posX, this.swellingCreeper.posY, this.swellingCreeper.posZ, 1.0D, 4.0D, 0.15D, 48);
+		    this.swellingCreeper.getEntityWorld().spawnEntity(fireSpiral);
+        }    
+
     }
 
     /**
@@ -73,15 +84,17 @@ public class EntityAICreeperSwellSpecial extends EntityAIBase
 //If target gone or no line of sight
         if (this.creeperAttackTarget == null || !this.swellingCreeper.canEntityBeSeen(this.creeperAttackTarget))
         {
-            //Then, starts unswelling
-            this.swellingCreeper.setCreeperStateSpecial(-1);
-//If interrupt by losing target will give up swelling after enough times
-            this.swellingCreeper.setCreeperSpecialInterrupted(this.swellingCreeper.getCreeperSpecialInterrupted() + 1);
+//Then, starts unswelling
+            this.swellingCreeperMixin.setCreeperStateSpecial(-1);
+//If interrupted by losing target will give up swelling after enough times
+            this.swellingCreeperMixin.setCreeperSpecialInterrupted(this.swellingCreeperMixin.getCreeperSpecialInterrupted() + 1);
         }
 //Else keep swelling
         else
         {
-            this.swellingCreeper.setCreeperStateSpecial(1);
+//Should look at target 
+		    this.swellingCreeper.getLookHelper().setLookPositionWithEntity(this.creeperAttackTarget, 30.0F, 30.0F);
+            this.swellingCreeperMixin.setCreeperStateSpecial(1);
         }
     }
 
@@ -90,25 +103,22 @@ public class EntityAICreeperSwellSpecial extends EntityAIBase
      */
     public void resetTask()
     {
-//idk why this is even here in the original task
-//      this.creeperAttackTarget = null;
-
-//When swelling interrupted undo it
-        this.swellingCreeper.resetCreeperSpecial();
-//      this.swellingCreeper.setCreeperStateSpecial(-1);
+        this.swellingCreeperMixin.resetCreeperSpecial();
 
 //If interrupted enough times
-        if(this.swellingCreeper.getCreeperSpecialInterrupted() >= this.swellingCreeper.getCreeperSpecialInterruptedMax())
+        if(this.swellingCreeperMixin.getCreeperSpecialInterrupted() >= this.swellingCreeperMixin.getCreeperSpecialInterruptedMax())
         {
 //Give up and reactivate cooldown
-            this.swellingCreeper.setCreeperSpecialCooldown(this.swellingCreeper.getCreeperSpecialCooldownFrustrated());
-            this.swellingCreeper.setCreeperSpecialInterrupted(0);
-            this.swellingCreeper.playSound(PrimitiveMobsSoundEvents.ENTITY_CREEPER_ANNOYED, 3.0F, 1.0F);
+            this.swellingCreeperMixin.setCreeperSpecialCooldown(this.swellingCreeperMixin.getCreeperSpecialCooldownFrustrated());
+            this.swellingCreeperMixin.setCreeperSpecialInterrupted(0);
+            //this.swellingCreeper.playSound(PrimitiveMobsSoundEvents.ENTITY_CREEPER_ANNOYED, 3.0F, 1.0F);
+            this.swellingCreeper.world.playSound(null, this.swellingCreeper.posX, this.swellingCreeper.posY, this.swellingCreeper.posZ, 
+            PrimitiveMobsSoundEvents.ENTITY_CREEPER_ANNOYED, SoundCategory.NEUTRAL, 2.0F, 1.0F);
         }
 //For regular interruptions has smaller cooldown
         else
         {
-            this.swellingCreeper.setCreeperSpecialCooldown(this.swellingCreeper.getCreeperSpecialCooldownInterrupted());            
+            this.swellingCreeperMixin.setCreeperSpecialCooldown(this.swellingCreeperMixin.getCreeperSpecialCooldownInterrupted());            
         }
     }
 }

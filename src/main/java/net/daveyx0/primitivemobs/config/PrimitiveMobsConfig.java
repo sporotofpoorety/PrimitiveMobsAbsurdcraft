@@ -20,7 +20,7 @@ public class PrimitiveMobsConfig {
 			dir.mkdirs();
 		}
 
-		config = new Configuration(new File(dir, "primitivemobs.cfg"));
+		config = new Configuration(new File(dir, "futuristicmobs.cfg"));
 		reloadConfig();
 		
 		MinecraftForge.EVENT_BUS.register(new PrimitiveMobsConfig());
@@ -45,6 +45,6 @@ public class PrimitiveMobsConfig {
 	
 	public static File getPrimitiveMobsConfigurationLocation(FMLPreInitializationEvent event)
 	{
-		return new File(event.getModConfigurationDirectory(), "primitivemobs");
+		return new File(event.getModConfigurationDirectory(), "futuristicmobs");
 	}
 }

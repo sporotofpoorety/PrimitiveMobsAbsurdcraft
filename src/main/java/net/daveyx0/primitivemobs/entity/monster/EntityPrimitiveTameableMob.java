@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import com.google.common.base.Optional;
 
 import net.daveyx0.multimob.util.EntityUtil;
-import net.daveyx0.primitivemobs.entity.EntityMobTameable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
@@ -46,29 +45,6 @@ public class EntityPrimitiveTameableMob extends EntityMob {
 	        this.dataManager.register(TAMED, Byte.valueOf((byte)0));
 	        this.dataManager.register(OWNER_UNIQUE_ID, Optional.absent());
 	    }
-
-
-	    /**
-	     * Called to update the entity's position/logic.
-	     */
-/*
-        @Override
-	    public void onUpdate()
-	    {
-	        super.onUpdate();
-
-	        if (!this.world.isRemote)
-	        {
-                if(this.world.getDifficulty() == EnumDifficulty.PEACEFUL)
-                {
-                    if(this.isTamed())
-                    {
-                        this.isDead = false;
-                    }
-                }
-	        }
-	    }
-*/
 
 	    /**
 	     * (abstract) Protected helper method to write subclass entity data to NBT.

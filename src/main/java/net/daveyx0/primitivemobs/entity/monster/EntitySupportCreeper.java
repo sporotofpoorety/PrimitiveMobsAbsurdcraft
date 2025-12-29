@@ -13,7 +13,6 @@ import net.daveyx0.multimob.util.EntityUtil;
 import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
 import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
 import net.daveyx0.primitivemobs.core.TaskUtils;
-import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellTameable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
@@ -54,12 +53,17 @@ public class EntitySupportCreeper extends EntityPrimitiveCreeper {
 
 	public EntitySupportCreeper(World worldIn) {
 		super(worldIn);
+//Conditional fire immunity
+        isImmuneToFire = true;
 
 //Buff ids provided by user
         buffIdList = new ArrayList<>(Arrays.asList(PrimitiveMobsConfigSpecial.getSupportCreeperBuffList()));
 //Conversion of buff Id list to Potion object list
         for(String buffId : buffIdList)
         {
+//Conditional fire immunity
+            if(buffId == "minecraft:fire_resistance") { isImmuneToFire = true; }
+
             Potion potion = ForgeRegistries.POTIONS.getValue(new ResourceLocation(buffId));
             buffObjectList.add(potion);
         }
@@ -139,6 +143,8 @@ public class EntitySupportCreeper extends EntityPrimitiveCreeper {
     public void readEntityFromNBT(NBTTagCompound compound)
     {
         super.readEntityFromNBT(compound);
+//Conditional fire immunity
+        isImmuneToFire = false;
 
 //If corresponding NBT present
         if (compound.hasKey("BuffIds"))
@@ -153,6 +159,8 @@ public class EntitySupportCreeper extends EntityPrimitiveCreeper {
             {
 //Get each buff ID
                 String id = idList.getStringTagAt(i);
+//Conditional fire immunity
+                if(id == "minecraft:fire_resistance") { isImmuneToFire = true; }
 //Fill buff ID list
                 buffIdList.add(id);
 //Buff object list too
@@ -322,7 +330,7 @@ public class EntitySupportCreeper extends EntityPrimitiveCreeper {
 	            {
 	            	if(entity != null && entity instanceof EntityMob && !(entity instanceof EntitySupportCreeper))
 	            	{
-	            		EntityMob mob1 = (EntityMob)entity;
+	            		EntityMob mob1 = (EntityMob) entity;
 	            		
 	            		if(mob1.getActivePotionEffects().isEmpty())
 	            		{
@@ -345,12 +353,17 @@ public class EntitySupportCreeper extends EntityPrimitiveCreeper {
 	        return null;
 	    }
 
-        public void applySpecifiedBuffsIfAbsent(EntityLivingBase entity, ArrayList<Potion> buffObjects, ArrayList<Integer> buffLengths, ArrayList<Integer> buffStrengths)
+//Apply specific buffs to entity if absent
+        public void applySpecifiedBuffsIfAbsent(EntityLivingBase entity, 
+        ArrayList<Potion> buffObjects, ArrayList<Integer> buffLengths, ArrayList<Integer> buffStrengths)
         {
+//For each buff object in ArrayList
             for(int i = 0; i < buffObjects.size(); i++)
             {
+//If entity does not have that buff object
                 if(entity.getActivePotionEffect(buffObjects.get(i)) == null)
                 {
+//Add buff
                     entity.addPotionEffect(new PotionEffect(buffObjects.get(i), buffLengths.get(i), buffStrengths.get(i)));
                 }
             }
