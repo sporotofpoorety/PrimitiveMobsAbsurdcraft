@@ -49,6 +49,10 @@ public class PrimitiveMobsSoundEvents
 
 	public static final SoundEvent ENTITY_CREEPER_PARTY = createSoundEvent("entity.creeper.party");
 
+	public static final SoundEvent ENTITY_CREEPER_BUFF_ATTEMPT = createSoundEvent("entity.creeper.buffattempt");
+
+	public static final SoundEvent ENTITY_CREEPER_BUFF_EXECUTE = createSoundEvent("entity.creeper.buffexecute");
+
 	
 	private static SoundEvent createSoundEvent(final String soundName) {
 		final ResourceLocation soundID = new ResourceLocation(PrimitiveMobsReference.MODID, soundName);
@@ -79,7 +83,9 @@ public class PrimitiveMobsSoundEvents
                     ENTITY_CREEPER_DIZZY,
                     ENTITY_CREEPER_NUKE,
                     ENTITY_CREEPER_ITEMBOX,
-                    ENTITY_CREEPER_PARTY
+                    ENTITY_CREEPER_PARTY,
+                    ENTITY_CREEPER_BUFF_ATTEMPT,
+                    ENTITY_CREEPER_BUFF_EXECUTE
 			);
 		}
 	}

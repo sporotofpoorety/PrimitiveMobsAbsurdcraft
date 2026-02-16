@@ -29,72 +29,71 @@ import net.minecraft.world.World;
 
 	public class EntityAIFlameSpewAttack extends EntityAIBase
     {
-        private final EntityFlameSpewer gooner;
-        private float irrelevantVariable;
+        private final EntityFlameSpewer spewer;
+        private float visualState;
 
 
-//1 means leaking, above means cumming
-        private int damBursting;
+//1 means preparing, above means shooting
+        private int attackStep;
 //Linear general timer
         private int nextActionCountdown;
 
 
-//Total time spent gooning and leaking before cumming
-        private int precumCountdownMax;
-//Cum lifetime
-        private int cumLifetime;
-//Cum particle density
-        private int cumParticles;
-//When in precum phase does foreskin protract and grant invulnerability
-        private int foreskinProtractWhen;
-//Is either leaking or already cumming
-        private boolean readyToCum;
-//Saw waifu while gooning
-        private boolean hasSeenWaifuYet;
-//When in precum phase does foreskin retract and go vulnerable
-        protected int foreskinRetractWhen;
+//Total time spent preattack and preparing before attacking
+        private int preAttackCountdownMax;
+//Shot lifetime
+        private int shotLifetime;
+//Shot particle density
+        private int shotParticles;
+//When in preattack phase, not on fire, and grant invulnerability
+        private int goInvulnerableWhen;
+//Is either preparing or already shooting
+        private boolean readyToShoot;
+//Saw target while preattack
+        private boolean hasSeenTargetYet;
+//When in preattack phase sets on fire and go vulnerable
+        protected int goVulnerableWhen;
 
 
-//Cum rapidfire specific
-        protected int cumRapidfireShots;
-        protected int cumRapidfireInterval;
-        protected double cumRapidfireSpread;
+//Attack rapidfire specific
+        protected int attackRapidfireShots;
+        protected int attackRapidfireInterval;
+        protected double attackRapidfireSpread;
 
 
 //Exclusive with movement and look tasks
-        public EntityAIFlameSpewAttack(EntityFlameSpewer goonerIn, int precumCountdownMax, int cumLifetime, int cumParticles,
-        int foreskinProtractWhen, int foreskinRetractWhen, int cumRapidfireShots, int cumRapidfireInterval, double cumRapidfireSpread)
+        public EntityAIFlameSpewAttack(EntityFlameSpewer spewerIn, int preAttackCountdownMax, int shotLifetime, int shotParticles,
+        int goInvulnerableWhen, int goVulnerableWhen, int attackRapidfireShots, int attackRapidfireInterval, double attackRapidfireSpread)
         {
-            this.gooner = goonerIn;
+            this.spewer = spewerIn;
             this.setMutexBits(3);
 
-            this.precumCountdownMax = precumCountdownMax;
-            this.cumLifetime = cumLifetime;
-            this.cumParticles = cumParticles;
-            this.foreskinProtractWhen = foreskinProtractWhen;
-            this.foreskinRetractWhen = foreskinRetractWhen;
-            this.cumRapidfireShots = cumRapidfireShots;
-            this.cumRapidfireInterval = cumRapidfireInterval;
-            this.cumRapidfireSpread = cumRapidfireSpread;
+            this.preAttackCountdownMax = preAttackCountdownMax;
+            this.shotLifetime = shotLifetime;
+            this.shotParticles = shotParticles;
+            this.goInvulnerableWhen = goInvulnerableWhen;
+            this.goVulnerableWhen = goVulnerableWhen;
+            this.attackRapidfireShots = attackRapidfireShots;
+            this.attackRapidfireInterval = attackRapidfireInterval;
+            this.attackRapidfireSpread = attackRapidfireSpread;
         }
 
 //Executes if it has target
         public boolean shouldExecute()
         {
-            EntityLivingBase waifu = this.gooner.getAttackTarget();
-            return waifu != null && waifu.isEntityAlive();
+            EntityLivingBase target = this.spewer.getAttackTarget();
+            return target != null && target.isEntityAlive();
         }
 
         public void startExecuting()
         {
-            this.irrelevantVariable = 0;
-//It's weird that it's implemented this way, but
-//the max damBursting actually represents the attack being FINISHED
-            this.damBursting = this.cumRapidfireShots;
+            this.visualState = 0;
+//The max attackStep actually represents the attack being FINISHED
+            this.attackStep = this.attackRapidfireShots;
 //Delay until next attack
-            this.nextActionCountdown = this.precumCountdownMax;
-            readyToCum = false;
-            hasSeenWaifuYet = false;
+            this.nextActionCountdown = this.preAttackCountdownMax;
+            readyToShoot = false;
+            hasSeenTargetYet = false;
         }
         
         /**
@@ -110,14 +109,14 @@ import net.minecraft.world.World;
          */
         public void resetTask()
         {
-            this.gooner.setForeskinPulled(false);
-            this.irrelevantVariable = 0;
-            this.damBursting = this.cumRapidfireShots;
-            this.nextActionCountdown = this.precumCountdownMax;
-            gooner.setNextActionCountdown(damBursting);
-            gooner.setIrrelevantVariable(irrelevantVariable);
-            this.gooner.setTouchingGrass(false);
-            readyToCum = false;
+            this.spewer.setOnFire(false);
+            this.visualState = 0;
+            this.attackStep = this.attackRapidfireShots;
+            this.nextActionCountdown = this.preAttackCountdownMax;
+            spewer.setNextActionCountdown(attackStep);
+            spewer.setVisualState(visualState);
+            this.spewer.setInDanger(false);
+            readyToShoot = false;
         }
 
         /**
@@ -127,144 +126,146 @@ import net.minecraft.world.World;
         {
 //Decrements attack delay
             --this.nextActionCountdown;
-            EntityLivingBase waifu = this.gooner.getAttackTarget();
+            EntityLivingBase target = this.spewer.getAttackTarget();
 
 //Inbetween-attack preparation and animation logic
-            if(!this.readyToCum && this.gooner.isInLava() && this.gooner.canEntityBeSeen(waifu))
+            if(!this.readyToShoot && this.spewer.isInLava() && this.spewer.canEntityBeSeen(target))
             {
 //Will still be on fire from a previous attack here
-//If half or less cooldown left
-            	if(nextActionCountdown <= this.foreskinProtractWhen)
+            	if(nextActionCountdown <= this.goInvulnerableWhen)
             	{
 //Cancel prior on fire
-            		this.gooner.setForeskinPulled(false);
-            		this.hasSeenWaifuYet = false;
+            		this.spewer.setOnFire(false);
+            		this.hasSeenTargetYet = false;
             	}
 //And then
-                if(!gooner.isForeskinPulled())
+                if(!spewer.isOnFire())
                 {
-                    if(this.gooner.canEntityBeSeen(waifu))
+                    if(this.spewer.canEntityBeSeen(target))
                     {
 //Set necessary flag for attack
-                    	this.hasSeenWaifuYet = true;
+                    	this.hasSeenTargetYet = true;
                     }
-//When not performing attack yet use damBursting for animation
-                    this.damBursting = (this.nextActionCountdown * (20 / this.precumCountdownMax));
+//When not performing attack yet use attackStep for animation
+                    this.attackStep = (this.nextActionCountdown * (20 / this.preAttackCountdownMax));
 
 //When attack time is very near does something related to animation
                     if(nextActionCountdown <= 3)
                     {
-                        this.irrelevantVariable += 0.05f;
+                        this.visualState += 0.05f;
                     }
                 }
             }
 
-            double d0 = this.gooner.getDistanceSq(waifu);
+            double d0 = this.spewer.getDistanceSq(target);
 
-//If target is close and gooner is not in lava
-            if (d0 < 5.0D && !this.gooner.isInLava())
+//If target is close and spewer is not in lava
+            if (d0 < 5.0D && !this.spewer.isInLava())
             {
 //In danger
-            	this.gooner.setTouchingGrass(true);
+            	this.spewer.setInDanger(true);
 /*
 //Melee attack every 20 ticks
                 if (this.nextActionCountdown <= 0)
                 {
                     this.nextActionCountdown = 20;
-                    this.gooner.attackEntityAsMob(waifu);
+                    this.spewer.attackEntityAsMob(target);
                 }
 */
             }
 
 //Attack logic is here
-            else if (d0 < (this.getFollowDistance() * this.getFollowDistance())  && this.gooner.isInLava())
+            else if (d0 < (this.getFollowDistance() * this.getFollowDistance())  && this.spewer.isInLava())
             {
-            	this.gooner.setTouchingGrass(false);
-                double d1 = waifu.posX - this.gooner.posX;
-                double d2 = waifu.getEntityBoundingBox().minY + (double)(waifu.height / 2.0F + 0.25f) - (this.gooner.posY + (double)(this.gooner.height / 2.0F));
-                double d3 = waifu.posZ - this.gooner.posZ;
+            	this.spewer.setInDanger(false);
+                double d1 = target.posX - this.spewer.posX;
+                double d2 = target.getEntityBoundingBox().minY + (double)(target.height / 2.0F + 0.25f) - (this.spewer.posY + (double)(this.spewer.height / 2.0F));
+                double d3 = target.posZ - this.spewer.posZ;
 
 //Attack only executes after nextActionCountdown reaches 0
                 if (this.nextActionCountdown <= 0)
                 {
-//damBursting of 1 represents pre-attack
-                    ++this.damBursting;
-                    irrelevantVariable -= 0.05f;
+//attackStep of 1 represents pre-attack
+                    ++this.attackStep;
+                    visualState -= 0.05f;
 
 //Pre-attack, some ticks between setting on fire and actually attacking
-                    if (this.damBursting == 1)
+                    if (this.attackStep == 1)
                     {
-                        this.nextActionCountdown = this.foreskinRetractWhen;
-                        this.gooner.setForeskinPulled(true);
-                        readyToCum = true;
+                        this.nextActionCountdown = this.goVulnerableWhen;
+                        this.spewer.setOnFire(true);
+                        readyToShoot = true;
                     }
 //Main shot delay logic
-                    else if (this.damBursting <= this.cumRapidfireShots)
+                    else if (this.attackStep <= this.attackRapidfireShots)
                     {
-                        this.nextActionCountdown = this.cumRapidfireInterval;
-                        this.gooner.setForeskinPulled(true);
-                        readyToCum = true;
+                        this.nextActionCountdown = this.attackRapidfireInterval;
+                        this.spewer.setOnFire(true);
+                        readyToShoot = true;
                     }
 //If max shots performed
                     else
                     {
-                        this.nextActionCountdown = this.precumCountdownMax;
-                        this.damBursting = this.cumRapidfireShots;
+                        this.nextActionCountdown = this.preAttackCountdownMax;
+                        this.attackStep = this.attackRapidfireShots;
 //This is the ACTUAL state reset and takes it back to inbetween-attack logic
-                        readyToCum = false;
+                        readyToShoot = false;
                     }
 
-                    if (this.damBursting > 1 && hasSeenWaifuYet)
+                    if (this.attackStep > 1 && hasSeenTargetYet)
                     {
                         float f = MathHelper.sqrt(MathHelper.sqrt(d0) * 0.1F);
-                        this.gooner.world.playEvent((EntityPlayer)null, 1018, new BlockPos((int)this.gooner.posX, (int)this.gooner.posY, (int)this.gooner.posZ), 0);
+                        this.spewer.world.playEvent((EntityPlayer)null, 1018, new BlockPos((int)this.spewer.posX, (int)this.spewer.posY, (int)this.spewer.posZ), 0);
 
                         for (int i = 0; i < 1; ++i)
                         {
-                            EntityFlameSpit entitysmallfireball = new EntityFlameSpit(this.gooner.world, this.gooner, d1 + this.gooner.getRNG().nextGaussian() * this.cumRapidfireSpread * (double)f, d2 - this.gooner.getRNG().nextGaussian() * this.cumRapidfireSpread * (double)f, d3 + this.gooner.getRNG().nextGaussian() * this.cumRapidfireSpread * (double)f, this.cumLifetime, this.cumParticles);
-                            entitysmallfireball.posY = this.gooner.posY + (double)(this.gooner.height / 2.0F) -0.5F;
-                            this.gooner.world.spawnEntity(entitysmallfireball);
+                            EntityFlameSpit entitysmallfireball = new EntityFlameSpit(this.spewer.world, this.spewer, d1 + this.spewer.getRNG().nextGaussian() * this.attackRapidfireSpread * (double)f, d2 - this.spewer.getRNG().nextGaussian() * this.attackRapidfireSpread * (double)f, d3 + this.spewer.getRNG().nextGaussian() * this.attackRapidfireSpread * (double)f, this.shotLifetime, this.shotParticles);
+                            entitysmallfireball.posY = this.spewer.posY + (double)(this.spewer.height / 2.0F) -0.5F;
+                            this.spewer.world.spawnEntity(entitysmallfireball);
                         }
                     }
                 }
             }
 //If not in range can approach target's position
-            else if(this.gooner.isInLava()  && this.gooner.canEntityBeSeen(waifu))
+            else if(this.spewer.isInLava()  && this.spewer.canEntityBeSeen(target) && !this.readyToShoot)
             {
-                double d1 = waifu.posX - this.gooner.posX;
-                double d3 = waifu.posZ - this.gooner.posZ;
-                gooner.motionX = d1 * 0.01;
-                gooner.motionZ = d3 * 0.01;
-            	this.gooner.setTouchingGrass(false);
-                gooner.setForeskinPulled(false);
+                double d1 = target.posX - this.spewer.posX;
+                double d3 = target.posZ - this.spewer.posZ;
+                spewer.motionX = d1 * 0.01;
+                spewer.motionZ = d3 * 0.01;
+            	this.spewer.setInDanger(false);
+                spewer.setOnFire(false);
             }
             else
             {
-            	this.gooner.getNavigator().clearPath();
-            	this.gooner.setTouchingGrass(false);
-                gooner.setForeskinPulled(false);
+                if(!this.readyToShoot)
+                {
+                	this.spewer.getNavigator().clearPath();
+                	this.spewer.setInDanger(false);
+                    spewer.setOnFire(false);
+                }
             }
             
-            this.gooner.getLookHelper().setLookPositionWithEntity(waifu, 10.0F, 10.0F);
+            this.spewer.getLookHelper().setLookPositionWithEntity(target, 10.0F, 10.0F);
             
-            if(irrelevantVariable < 0)
+            if(visualState < 0)
             {
-            	irrelevantVariable = 0; 
+            	visualState = 0; 
             }
-            else if (irrelevantVariable > 0.4)
+            else if (visualState > 0.4)
             {
-            	irrelevantVariable = 0.4f;
+            	visualState = 0.4f;
             }
             
-            gooner.setIrrelevantVariable(irrelevantVariable);
-            gooner.setNextActionCountdown(damBursting);
+            spewer.setVisualState(visualState);
+            spewer.setNextActionCountdown(attackStep);
 
             super.updateTask();
         }
 
         private double getFollowDistance()
         {
-            IAttributeInstance iattributeinstance = this.gooner.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
+            IAttributeInstance iattributeinstance = this.spewer.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
             return iattributeinstance == null ? 16.0D : iattributeinstance.getAttributeValue();
         }
     }

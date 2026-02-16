@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class PrimitiveMobsRandomWeightedItem {
 //Trying to generalize
 //Should take a list of items and a list of weights then return a random one    
-    public static <itemType> itemType getRandomWeightedItem(ArrayList<itemType> items, ArrayList<Integer> weights)
+    public static <arrayItemType> arrayItemType getRandomWeightedItem(ArrayList<arrayItemType> items, ArrayList<Integer> weights)
     {
 //Ranges for picking weighted items 
         ArrayList<Integer> probabilityStops = new ArrayList<>();

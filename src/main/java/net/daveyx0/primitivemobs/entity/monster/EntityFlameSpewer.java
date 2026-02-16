@@ -46,43 +46,43 @@ import net.minecraft.world.World;
 
 public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IMultiMobLava {
 
-    private static final DataParameter<Byte> FORESKIN_PULLED = EntityDataManager.<Byte>createKey(EntityFlameSpewer.class, DataSerializers.BYTE);
-    private static final DataParameter<Byte> TOUCHING_GRASS = EntityDataManager.<Byte>createKey(EntityFlameSpewer.class, DataSerializers.BYTE);
+    private static final DataParameter<Byte> ON_FIRE = EntityDataManager.<Byte>createKey(EntityFlameSpewer.class, DataSerializers.BYTE);
+    private static final DataParameter<Byte> IN_DANGER = EntityDataManager.<Byte>createKey(EntityFlameSpewer.class, DataSerializers.BYTE);
     private static final DataParameter<Integer> NEXT_COUNTDOWN = EntityDataManager.<Integer>createKey(EntityFlameSpewer.class, DataSerializers.VARINT);
-    private static final DataParameter<Float> IRRELEVANT_VARIABLE = EntityDataManager.<Float>createKey(EntityFlameSpewer.class, DataSerializers.FLOAT);
+    private static final DataParameter<Float> VISUAL_STATE = EntityDataManager.<Float>createKey(EntityFlameSpewer.class, DataSerializers.FLOAT);
 
-    private int precumCountdownMax;
-    protected int cumLifetime;
-    protected int cumParticles;
-    private int foreskinProtractWhen;
-    private int foreskinRetractWhen;
-    private int cumRapidfireShots;
-    protected int cumRapidfireInterval;
-    protected double cumRapidfireSpread;
+    private int preAttackCountdownMax;
+    protected int shotLifetime;
+    protected int shotParticles;
+    private int goInvulnerableWhen;
+    private int goVulnerableWhen;
+    private int attackRapidfireShots;
+    protected int attackRapidfireInterval;
+    protected double attackRapidfireSpread;
 
     
 	public EntityFlameSpewer(World worldIn) {
 		super(worldIn);
 
 		this.isImmuneToFire = true;
-		this.setForeskinPulled(false);
-		this.setTouchingGrass(false);
+		this.setOnFire(false);
+		this.setInDanger(false);
 		this.setNextActionCountdown(10);
-		this.setIrrelevantVariable(0);
+		this.setVisualState(0);
 		this.setSize(1f, 1.25f);
 		this.setPathPriority(PathNodeType.LAVA, 10);
 
-        this.precumCountdownMax = PrimitiveMobsConfigSpecial.getFlameSpewerPrecumCountdownMax();
-        this.cumLifetime = PrimitiveMobsConfigSpecial.getFlameSpewerCumLifetime();
-        this.cumParticles = PrimitiveMobsConfigSpecial.getFlameSpewerCumParticles();
-        this.foreskinProtractWhen = PrimitiveMobsConfigSpecial.getFlameSpewerForeskinProtractWhen();
-        this.foreskinRetractWhen = PrimitiveMobsConfigSpecial.getFlameSpewerForeskinRetractWhen();
-        this.cumRapidfireShots = PrimitiveMobsConfigSpecial.getflameSpewerCumRapidfireShots();
-        this.cumRapidfireInterval = PrimitiveMobsConfigSpecial.getFlameSpewerCumRapidfireInterval();
-        this.cumRapidfireSpread = PrimitiveMobsConfigSpecial.getFlameSpewerCumRapidfireSpread();
+        this.preAttackCountdownMax = PrimitiveMobsConfigSpecial.getFlameSpewerPreAttackCountdownMax();
+        this.shotLifetime = PrimitiveMobsConfigSpecial.getFlameSpewerShotLifetime();
+        this.shotParticles = PrimitiveMobsConfigSpecial.getFlameSpewerShotParticles();
+        this.goInvulnerableWhen = PrimitiveMobsConfigSpecial.getFlameSpewerGoInvulnerableWhen();
+        this.goVulnerableWhen = PrimitiveMobsConfigSpecial.getFlameSpewerGoVulnerableWhen();
+        this.attackRapidfireShots = PrimitiveMobsConfigSpecial.getflameSpewerAttackRapidfireShots();
+        this.attackRapidfireInterval = PrimitiveMobsConfigSpecial.getFlameSpewerAttackRapidfireInterval();
+        this.attackRapidfireSpread = PrimitiveMobsConfigSpecial.getFlameSpewerAttackRapidfireSpread();
 
-		this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.precumCountdownMax, this.cumLifetime, this.cumParticles,
-        this.foreskinProtractWhen, this.foreskinRetractWhen, this.cumRapidfireShots, this.cumRapidfireInterval, this.cumRapidfireSpread));
+		this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.preAttackCountdownMax, this.shotLifetime, this.shotParticles,
+        this.goInvulnerableWhen, this.goVulnerableWhen, this.attackRapidfireShots, this.attackRapidfireInterval, this.attackRapidfireSpread));
 	}
 
 	protected void initEntityAI()
@@ -103,67 +103,6 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
         return livingdata;
     }
 
-	  /**
-     * (abstract) Protected helper method to write subclass entity data to NBT.
-     */
-    public void writeEntityToNBT(NBTTagCompound compound)
-    {
-        super.writeEntityToNBT(compound);
-
-        compound.setInteger("NextActionCountdown", this.getNextActionCountdown());
-        compound.setFloat("IrrelevantVariable", this.getIrrelevantVariable());
-        compound.setBoolean("ForeskinPulled", this.isForeskinPulled());
-        compound.setBoolean("TouchingGrass", this.isTouchingGrass());
-
-//Preserves field values including assigned by NBT
-        compound.setInteger("PrecumCountdownMax", precumCountdownMax);
-        compound.setInteger("CumLifetime", cumLifetime);
-        compound.setInteger("CumParticles", cumParticles);
-        compound.setInteger("ForeskinProtractWhen", foreskinProtractWhen);
-        compound.setInteger("ForeskinRetractWhen", foreskinRetractWhen);
-        compound.setInteger("CumRapidfireShots", cumRapidfireShots);
-        compound.setInteger("CumRapidfireInterval", cumRapidfireInterval);
-        compound.setDouble("CumRapidfireSpread", cumRapidfireSpread);
-    }
-
-    /**
-     * (abstract) Protected helper method to read subclass entity data from NBT.
-     */
-    public void readEntityFromNBT(NBTTagCompound compound)
-    {
-        super.readEntityFromNBT(compound);
-
-        this.setNextActionCountdown(compound.getInteger("NextActionCountdown"));
-        this.setIrrelevantVariable(compound.getFloat("IrrelevantVariable"));
-        this.setForeskinPulled(compound.getBoolean("ForeskinPulled"));
-        this.setTouchingGrass(compound.getBoolean("TouchingGrass"));
-
-//Avoids overwriting the fields with empty NBT tag values on initial spawn
-        if (compound.hasKey("PrecumCountdownMax")) { this.precumCountdownMax = compound.getInteger("PrecumCountdownMax"); }
-        if (compound.hasKey("CumLifetime")) { this.cumLifetime = compound.getInteger("CumLifetime"); }
-        if (compound.hasKey("CumParticles")) { this.cumParticles = compound.getInteger("CumParticles"); }
-        if (compound.hasKey("ForeskinProtractWhen")) { this.foreskinProtractWhen = compound.getInteger("ForeskinProtractWhen"); }
-        if (compound.hasKey("ForeskinRetractWhen")) { this.foreskinRetractWhen = compound.getInteger("ForeskinRetractWhen"); }
-        if (compound.hasKey("CumRapidfireShots")) { this.cumRapidfireShots = compound.getInteger("CumRapidfireShots"); }
-        if (compound.hasKey("CumRapidfireInterval")) { this.cumRapidfireInterval = compound.getInteger("CumRapidfireInterval"); }
-        if (compound.hasKey("CumRapidfireSpread")) { this.cumRapidfireSpread = compound.getDouble("CumRapidfireSpread"); }
-
-//Add task if absent
-        if(!TaskUtils.mobHasTask(this, EntityAIFlameSpewAttack.class))
-        {
-		    this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.precumCountdownMax, this.cumLifetime, this.cumParticles,
-            this.foreskinProtractWhen, this.foreskinRetractWhen, this.cumRapidfireShots, this.cumRapidfireInterval, this.cumRapidfireSpread));
-        }
-//If task is here remove then reassign based on NBT (can be used to overwrite configs and make custom variants)
-        else
-        {
-            TaskUtils.mobRemoveTaskIfPresent(this, EntityAIFlameSpewAttack.class);
-
-		    this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.precumCountdownMax, this.cumLifetime, this.cumParticles,
-            this.foreskinProtractWhen, this.foreskinRetractWhen, this.cumRapidfireShots, this.cumRapidfireInterval, this.cumRapidfireSpread));       
-        }
-
-    }
 	
     protected void applyEntityAttributes()
     {
@@ -176,10 +115,10 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
     protected void entityInit()
     {
         super.entityInit();
-        this.dataManager.register(FORESKIN_PULLED, Byte.valueOf((byte)0));
-        this.dataManager.register(TOUCHING_GRASS, Byte.valueOf((byte)0));
+        this.dataManager.register(ON_FIRE, Byte.valueOf((byte)0));
+        this.dataManager.register(IN_DANGER, Byte.valueOf((byte)0));
         this.getDataManager().register(NEXT_COUNTDOWN, Integer.valueOf(0));
-        this.getDataManager().register(IRRELEVANT_VARIABLE, Float.valueOf(0));
+        this.getDataManager().register(VISUAL_STATE, Float.valueOf(0));
     }
     
     protected SoundEvent getAmbientSound()
@@ -202,8 +141,8 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
      */
     public boolean isEntityInvulnerable(DamageSource source)
     {
-//      return this.getNextActionCountdown() < 10 || this.getIrrelevantVariable() > 0;
-        return !this.isForeskinPulled();
+//      return this.getNextActionCountdown() < 10 || this.getVisualState() > 0;
+        return !this.isOnFire();
     }
 
     
@@ -212,9 +151,9 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
         this.getDataManager().set(NEXT_COUNTDOWN, Integer.valueOf(time));
     }
     
-    public void setIrrelevantVariable(float irrelevantVariable)
+    public void setVisualState(float visualState)
     {
-        this.getDataManager().set(IRRELEVANT_VARIABLE, Float.valueOf(irrelevantVariable));
+        this.getDataManager().set(VISUAL_STATE, Float.valueOf(visualState));
     }
     
     public int getNextActionCountdown()
@@ -222,9 +161,9 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
         return ((Integer)this.getDataManager().get(NEXT_COUNTDOWN)).intValue();
     }
     
-    public float getIrrelevantVariable()
+    public float getVisualState()
     {
-        return ((Float)this.getDataManager().get(IRRELEVANT_VARIABLE)).floatValue();
+        return ((Float)this.getDataManager().get(VISUAL_STATE)).floatValue();
     }
     
 	
@@ -257,7 +196,7 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
 	    	}
 	    }
 	    
-	    //MultiMob.LOGGER.info(this.getNextActionCountdown() + " " + this.getIrrelevantVariable() + " " + this.isForeskinPulled());
+	    //MultiMob.LOGGER.info(this.getNextActionCountdown() + " " + this.getVisualState() + " " + this.isOnFire());
 	}
 	
     /**
@@ -320,16 +259,16 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
     }
 	
 	
-    public boolean isForeskinPulled()
+    public boolean isOnFire()
     {
-        return (((Byte)this.dataManager.get(FORESKIN_PULLED)).byteValue() & 1) != 0;
+        return (((Byte)this.dataManager.get(ON_FIRE)).byteValue() & 1) != 0;
     }
 
-    public void setForeskinPulled(boolean ForeskinPulled)
+    public void setOnFire(boolean onFire)
     {
-        byte b0 = ((Byte)this.dataManager.get(FORESKIN_PULLED)).byteValue();
+        byte b0 = ((Byte)this.dataManager.get(ON_FIRE)).byteValue();
 
-        if (ForeskinPulled)
+        if (onFire)
         {
             b0 = (byte)(b0 | 1);
         }
@@ -338,19 +277,19 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
             b0 = (byte)(b0 & -2);
         }
 
-        this.dataManager.set(FORESKIN_PULLED, Byte.valueOf(b0));
+        this.dataManager.set(ON_FIRE, Byte.valueOf(b0));
     }
     
-    public boolean isTouchingGrass()
+    public boolean isInDanger()
     {
-        return (((Byte)this.dataManager.get(TOUCHING_GRASS)).byteValue() & 1) != 0;
+        return (((Byte)this.dataManager.get(IN_DANGER)).byteValue() & 1) != 0;
     }
 
-    public void setTouchingGrass(boolean ForeskinPulled)
+    public void setInDanger(boolean OnFire)
     {
-        byte b0 = ((Byte)this.dataManager.get(TOUCHING_GRASS)).byteValue();
+        byte b0 = ((Byte)this.dataManager.get(IN_DANGER)).byteValue();
 
-        if (ForeskinPulled)
+        if (OnFire)
         {
             b0 = (byte)(b0 | 1);
         }
@@ -359,7 +298,7 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
             b0 = (byte)(b0 & -2);
         }
 
-        this.dataManager.set(TOUCHING_GRASS, Byte.valueOf(b0));
+        this.dataManager.set(IN_DANGER, Byte.valueOf(b0));
     }
 
     /**
@@ -446,4 +385,69 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
     	return super.isCreatureType(type, forSpawnCount);
     }
 
+
+
+
+	  /**
+     * (abstract) Protected helper method to write subclass entity data to NBT.
+     */
+    public void writeEntityToNBT(NBTTagCompound compound)
+    {
+        super.writeEntityToNBT(compound);
+
+        compound.setInteger("NextActionCountdown", this.getNextActionCountdown());
+        compound.setFloat("VisualState", this.getVisualState());
+        compound.setBoolean("OnFire", this.isOnFire());
+        compound.setBoolean("InDanger", this.isInDanger());
+
+//Preserves field values including assigned by NBT
+        compound.setInteger("PreAttackCountdownMax", preAttackCountdownMax);
+        compound.setInteger("ShotLifetime", shotLifetime);
+        compound.setInteger("ShotParticles", shotParticles);
+        compound.setInteger("GoInvulnerableWhen", goInvulnerableWhen);
+        compound.setInteger("GoVulnerableWhen", goVulnerableWhen);
+        compound.setInteger("AttackRapidfireShots", attackRapidfireShots);
+        compound.setInteger("AttackRapidfireInterval", attackRapidfireInterval);
+        compound.setDouble("AttackRapidfireSpread", attackRapidfireSpread);
+    }
+
+
+    /**
+     * (abstract) Protected helper method to read subclass entity data from NBT.
+     */
+    public void readEntityFromNBT(NBTTagCompound compound)
+    {
+        super.readEntityFromNBT(compound);
+
+        this.setNextActionCountdown(compound.getInteger("NextActionCountdown"));
+        this.setVisualState(compound.getFloat("VisualState"));
+        this.setOnFire(compound.getBoolean("OnFire"));
+        this.setInDanger(compound.getBoolean("InDanger"));
+
+//Avoids overwriting the fields with empty NBT tag values on initial spawn
+        if (compound.hasKey("PreAttackCountdownMax")) { this.preAttackCountdownMax = compound.getInteger("PreAttackCountdownMax"); }
+        if (compound.hasKey("ShotLifetime")) { this.shotLifetime = compound.getInteger("ShotLifetime"); }
+        if (compound.hasKey("ShotParticles")) { this.shotParticles = compound.getInteger("ShotParticles"); }
+        if (compound.hasKey("GoInvulnerableWhen")) { this.goInvulnerableWhen = compound.getInteger("GoInvulnerableWhen"); }
+        if (compound.hasKey("GoVulnerableWhen")) { this.goVulnerableWhen = compound.getInteger("GoVulnerableWhen"); }
+        if (compound.hasKey("AttackRapidfireShots")) { this.attackRapidfireShots = compound.getInteger("AttackRapidfireShots"); }
+        if (compound.hasKey("AttackRapidfireInterval")) { this.attackRapidfireInterval = compound.getInteger("AttackRapidfireInterval"); }
+        if (compound.hasKey("AttackRapidfireSpread")) { this.attackRapidfireSpread = compound.getDouble("AttackRapidfireSpread"); }
+
+//Add task if absent
+        if(!TaskUtils.mobHasTask(this, EntityAIFlameSpewAttack.class))
+        {
+		    this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.preAttackCountdownMax, this.shotLifetime, this.shotParticles,
+            this.goInvulnerableWhen, this.goVulnerableWhen, this.attackRapidfireShots, this.attackRapidfireInterval, this.attackRapidfireSpread));
+        }
+//If task is here remove then reassign based on NBT (can be used to overwrite configs and make custom variants)
+        else
+        {
+            TaskUtils.mobRemoveTaskIfPresent(this, EntityAIFlameSpewAttack.class);
+
+		    this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.preAttackCountdownMax, this.shotLifetime, this.shotParticles,
+            this.goInvulnerableWhen, this.goVulnerableWhen, this.attackRapidfireShots, this.attackRapidfireInterval, this.attackRapidfireSpread));       
+        }
+
+    }
 }

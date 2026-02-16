@@ -74,6 +74,7 @@ public class EntityAISwitchBetweenRangedAndMelee extends EntityAIAttackMelee
 	{
 		super.resetTask();
 		this.entity.setSwingingArms(false);
+//seeTime can be negative
 		this.seeTime = 0;
 		this.attackTime = -1;
 		this.entity.resetActiveHand();
@@ -87,36 +88,62 @@ public class EntityAISwitchBetweenRangedAndMelee extends EntityAIAttackMelee
 		EntityLivingBase entitylivingbase = this.entity.getAttackTarget();
 
 		if (entitylivingbase != null) {
-//Ranged and strafe behavior
+//If holding a bow
 			if(this.isBowInMainhand()) {
-				double d0 = this.entity.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
-				boolean flag = this.entity.getEntitySenses().canSee(entitylivingbase);
-				boolean flag1 = this.seeTime > 0;
 
-				if (flag != flag1)
+				double targetDist = this.entity.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+				boolean seesTarget = this.entity.getEntitySenses().canSee(entitylivingbase);
+				boolean positiveSeeTime = this.seeTime > 0;
+
+
+
+
+//If positive see time but doesn't see target
+				if ((positiveSeeTime && !seesTarget)
+//Or sees target but negative seeTime
+                || (seesTarget && !positiveSeeTime))
 				{
+//Set seeTime to 0
 					this.seeTime = 0;
 				}
 
-				if (flag)
+
+
+
+//seeTime increment
+				if (seesTarget)
 				{
 					++this.seeTime;
 				}
+//Or decrement
 				else
 				{
 					--this.seeTime;
 				}
 
-				if (d0 <= (double)this.maxAttackDistance && this.seeTime >= 20)
+
+
+
+//If target is close enough 
+//and has seen target for enough time
+				if (targetDist <= (double)this.maxAttackDistance && this.seeTime >= 20)
 				{
+//Clear current path
 					this.entity.getNavigator().clearPath();
+//And increment strafe time
 					++this.strafingTime;
 				}
+//If target far or not seen long enough
 				else
 				{
+//Approach target
 					this.entity.getNavigator().tryMoveToEntityLiving(entitylivingbase, this.moveSpeedAmp);
+//And reset strafe time
 					this.strafingTime = -1;
 				}
+
+
+
 
 //At 1 second intervals of strafing alternate strafing randomly
 				if (this.strafingTime >= 20)
@@ -133,14 +160,18 @@ public class EntityAISwitchBetweenRangedAndMelee extends EntityAIAttackMelee
 
 					this.strafingTime = 0;
 				}
+
+
+
+
 //Strafing forced to change at certain distance intervals
 				if (this.strafingTime > -1)
 				{
-					if (d0 > (double)(this.maxAttackDistance * 0.75F))
+					if (targetDist > (double)(this.maxAttackDistance * 0.75F))
 					{
 						this.strafingBackwards = false;
 					}
-					else if (d0 < (double)(this.maxAttackDistance * 0.25F))
+					else if (targetDist < (double)(this.maxAttackDistance * 0.25F))
 					{
 						this.strafingBackwards = true;
 					}
@@ -153,13 +184,16 @@ public class EntityAISwitchBetweenRangedAndMelee extends EntityAIAttackMelee
 					this.entity.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
 				}
 
+
+
+
 				if (this.entity.isHandActive())
 				{
-					if (!flag && this.seeTime < -60)
+					if (!seesTarget && this.seeTime < -60)
 					{
 						this.entity.resetActiveHand();
 					}
-					else if (flag)
+					else if (seesTarget)
 					{
 						int i = this.entity.getItemInUseMaxCount();
 
@@ -175,11 +209,17 @@ public class EntityAISwitchBetweenRangedAndMelee extends EntityAIAttackMelee
 				{
 					this.entity.setActiveHand(EnumHand.MAIN_HAND);
 				}
+
+
+
+
 			}
-//Simple melee
+//If not holding a bow
 			else
 			{
+//Movement becomes linear
 				this.entity.setMoveStrafing(0);
+//And executes EntityAIAttackMelee
 				super.updateTask();
 			}
 		}

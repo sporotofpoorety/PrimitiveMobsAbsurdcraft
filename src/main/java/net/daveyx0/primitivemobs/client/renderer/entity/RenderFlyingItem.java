@@ -2,7 +2,6 @@ package net.daveyx0.primitivemobs.client.renderer.entity;
 
 import net.daveyx0.multimob.core.MultiMob;
 import net.daveyx0.primitivemobs.entity.item.EntityFlameSpit;
-import net.daveyx0.primitivemobs.entity.item.EntityFlameSpitBurst;
 import net.daveyx0.primitivemobs.entity.item.EntityPrimitiveThrowable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -34,7 +33,7 @@ public class RenderFlyingItem<T extends Entity> extends Render<T>
      */
     public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
-    	if(entity instanceof EntityFlameSpit || entity instanceof EntityFlameSpitBurst) {return;}
+    	if(entity instanceof EntityFlameSpit) {return;}
         GlStateManager.pushMatrix();
         GlStateManager.translate((float)x, (float)y, (float)z);
         GlStateManager.enableRescaleNormal();

@@ -12,24 +12,28 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Mod.EventBusSubscriber(value= Side.CLIENT, modid = PrimitiveMobsReference.MODID)
-public class PrimitiveMobsClientProxy extends PrimitiveMobsCommonProxy {
+public class PrimitiveMobsClientProxy extends PrimitiveMobsCommonProxy 
+{
 	
-	 @Override
-	    public void preInit(FMLPreInitializationEvent event) {
-	        OBJLoader.INSTANCE.addDomain(PrimitiveMobsReference.MODID);
-	        PrimitiveMobsEntityRegistry.registerRenderers();
-	        super.preInit(event);
-	    }
+    @Override
+    public void preInit(FMLPreInitializationEvent event) 
+    {
+        OBJLoader.INSTANCE.addDomain(PrimitiveMobsReference.MODID);
+        PrimitiveMobsEntityRegistry.registerRenderers();
+        super.preInit(event);
+    }
 
-	    @Override
-	    public void init(FMLInitializationEvent event) {
-	    	super.init(event);
-	    }
+    @Override
+    public void init(FMLInitializationEvent event) 
+    {
+    	super.init(event);
+    }
 
-	    @Override
-	    public void postInit(FMLPostInitializationEvent event) {
-	    	PrimitiveMobsItems.registerItemColors();
-	    	super.postInit(event);
-	    }
+    @Override
+    public void postInit(FMLPostInitializationEvent event) 
+    {
+    	PrimitiveMobsItems.registerItemColors();
+    	super.postInit(event);
+    }
 	    
 }

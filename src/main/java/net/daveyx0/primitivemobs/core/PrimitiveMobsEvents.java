@@ -18,7 +18,6 @@ import net.daveyx0.primitivemobs.entity.monster.EntitySkeletonWarrior;
 import net.daveyx0.primitivemobs.entity.passive.EntityChameleon;
 import net.daveyx0.primitivemobs.entity.passive.EntityLostMiner;
 import net.daveyx0.primitivemobs.entity.passive.EntitySheepman;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityMob;
 import net.daveyx0.primitivemobs.item.ItemCamouflageArmor;
 import net.daveyx0.primitivemobs.item.ItemGoblinMace;
 import net.daveyx0.primitivemobs.message.MessagePrimitiveJumping;
@@ -66,6 +65,12 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+
+import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityLiving;
+
+
+
 
 public class PrimitiveMobsEvents {
 
@@ -302,108 +307,121 @@ public static class EntityEventHandler {
 		
 
 	}
-	
+
+//NOTE TO SELF: 
+//SETATTACKTARGET() CAN CAUSE RECURSION WITH THIS EVENT
 	@SubscribeEvent
 	public void onSetAttackTarget(LivingSetAttackTargetEvent event)
 	{
+
 	    EntityLiving living = (EntityLiving) event.getEntityLiving();
+
+        if(!living.world.isRemote)
+        {
 //If attacker not null
-		if(living != null)
-		{
-//Let's see if this actually makes the stun work
-            if(living instanceof EntityMob)
-            {
-                IMixinEntityMob selfEntityMobMixin = (IMixinEntityMob) (Object) living;
-//Can't target anything if stunned
-                if(selfEntityMobMixin.getAbsurdcraftStunned())
-                {
-		            living.setAttackTarget(null);
-                }
-            }
-
-
+		    if(living != null)
+		    {
 //Nothing targets chameleons
-	        if(event.getTarget() instanceof EntityChameleon)
-	        {
-		        living.setAttackTarget(null);
-	        }   
-		    
+	            if(event.getTarget() instanceof EntityChameleon)
+	            {
+		            living.setAttackTarget(null);
+	            }
 
+//ANTI-RECURSION GUARD HERE
+//If TARGET not null
+                if(event.getTarget() != null)
+                {
+//Let's see if this actually makes the stun work
+                    IMixinEntityLiving selfEntityLivingMixin = (IMixinEntityLiving) (Object) living;
+//Can't target anything if stunned
+                    if(selfEntityLivingMixin.getAbsurdcraftStunned())
+                    {
+	                    living.setAttackTarget(null);
+                    }
+   
+		            
 //Reworked camouflage armor
 //(Hopefully functional this time lol)
-		    if(event.getTarget() != null && event.getTarget() instanceof EntityPlayer && event.getEntityLiving() instanceof EntityLiving)
-		    {
-			    EntityPlayer player = (EntityPlayer)event.getTarget();
-                double maxDistance = PrimitiveMobsConfigSpecial.getCamouflageOverride()
-                ? Math.pow(PrimitiveMobsConfigSpecial.getCamouflageOverrideValue(), 2)
-                : Math.pow((living.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).getAttributeValue() 
-                                        / PrimitiveMobsConfigSpecial.getCamouflageDivisorValue()), 2);
+		            if(event.getTarget() != null && event.getTarget() instanceof EntityPlayer && event.getEntityLiving() instanceof EntityLiving)
+		            {
+			            EntityPlayer player = (EntityPlayer)event.getTarget();
+                        
+                        if(hasFullCamouflageArmor(player))
+                        {
+                            double maxDistance = PrimitiveMobsConfigSpecial.getCamouflageOverride()
+                            ? Math.pow(PrimitiveMobsConfigSpecial.getCamouflageOverrideValue(), 2)
+                            : Math.pow((living.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).getAttributeValue() 
+                                                    / PrimitiveMobsConfigSpecial.getCamouflageDivisorValue()), 2);
 
-                
-                boolean attackerDeny = PrimitiveMobsConfigSpecial.getCamouflageAttackerDeny();
-                boolean victimDeny = PrimitiveMobsConfigSpecial.getCamouflageVictimDeny();
-                
-                if(attackerDeny)
-                {
-                    if(victimDeny)
-                    {
-			            if(living.getLastAttackedEntity() != player && living.getAttackingEntity() != player && hasFullCamouflageArmor(player) && living.getDistanceSq(player) > maxDistance)
-			            {
-				            living.setAttackTarget(null);
-			            }
-			            else
-			            {
-				            living.setLastAttackedEntity(player);
-			            }                
-                    }
-                    else
-                    {
-			            if(living.getLastAttackedEntity() != player && hasFullCamouflageArmor(player) && living.getDistanceSq(player) > maxDistance)
-			            {
-				            living.setAttackTarget(null);
-			            }
-			            else
-			            {
-				            living.setLastAttackedEntity(player);
-			            }                       
-                    }
-                } 
-                else 
-                {
-                    if(victimDeny) 
-                    {
-			            if(living.getAttackingEntity() != player && hasFullCamouflageArmor(player) && living.getDistanceSq(player) > maxDistance)
-			            {
-				            living.setAttackTarget(null);
-			            }
-			            else
-			            {
-				            living.setLastAttackedEntity(player);
-			            }                 
-                    }
-                    else 
-                    {
-			            if(hasFullCamouflageArmor(player) && living.getDistanceSq(player) > maxDistance)
-			            {
-				            living.setAttackTarget(null);
-			            }
-			            else
-			            {
-				            living.setLastAttackedEntity(player);
-			            }             
-                    }
+                            
+                            boolean attackerDeny = PrimitiveMobsConfigSpecial.getCamouflageAttackerDeny();
+                            boolean victimDeny = PrimitiveMobsConfigSpecial.getCamouflageVictimDeny();
+                            
+                            if(attackerDeny)
+                            {
+                                if(victimDeny)
+                                {
+			                        if(living.getLastAttackedEntity() != player && living.getAttackingEntity() != player && living.getDistanceSq(player) > maxDistance)
+			                        {
+				                        living.setAttackTarget(null);
+			                        }
+			                        else
+			                        {
+				                        living.setLastAttackedEntity(player);
+			                        }                
+                                }
+                                else
+                                {
+			                        if(living.getLastAttackedEntity() != player && living.getDistanceSq(player) > maxDistance)
+			                        {
+				                        living.setAttackTarget(null);
+			                        }
+			                        else
+			                        {
+				                        living.setLastAttackedEntity(player);
+			                        }                       
+                                }
+                            } 
+                            else 
+                            {
+                                if(victimDeny) 
+                                {
+			                        if(living.getAttackingEntity() != player && living.getDistanceSq(player) > maxDistance)
+			                        {
+				                        living.setAttackTarget(null);
+			                        }
+			                        else
+			                        {
+				                        living.setLastAttackedEntity(player);
+			                        }                 
+                                }
+                                else 
+                                {
+			                        if(living.getDistanceSq(player) > maxDistance)
+			                        {
+				                        living.setAttackTarget(null);
+			                        }
+			                        else
+			                        {
+				                        living.setLastAttackedEntity(player);
+			                        }             
+                                }
+                            }
+                            
+
+			                if(living.getLastAttackedEntity() != player && living.getAttackingEntity() != player 
+                            && living.getDistanceSq(player) > 36)
+			                {
+				                living.setAttackTarget(null);
+			                }
+			                else
+			                {
+				                living.setLastAttackedEntity(player);
+			                }
+                        }
+		            }
                 }
-                
-
-			    if(living.getLastAttackedEntity() != player && living.getAttackingEntity() != player && hasFullCamouflageArmor(player) && living.getDistanceSq(player) > 36)
-			    {
-				    living.setAttackTarget(null);
-			    }
-			    else
-			    {
-				    living.setLastAttackedEntity(player);
-			    }
-		    }
+            }
         }     
 	}
 

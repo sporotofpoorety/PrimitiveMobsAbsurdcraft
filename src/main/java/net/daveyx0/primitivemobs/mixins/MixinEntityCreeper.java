@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.entity.ai.EntityAIStun;
 import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 
 import net.minecraft.entity.Entity;
@@ -29,6 +28,10 @@ import net.minecraft.util.SoundCategory;
 
 import net.minecraft.world.World;
 
+import org.sporotofpoorety.eternitymode.entity.ai.EntityAIStun;
+
+
+
 
 //Mixin this class
 @Mixin(value = EntityCreeper.class, remap = true)
@@ -39,26 +42,27 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
 //Have to shadow to access target class direct fields and methods
     @Shadow 
     private int timeSinceIgnited;
-
     @Shadow
     private int explosionRadius;
 
 
-//New mutable state fields
-
-//And a data parameter too
+//Special handlers
+//Including a data parameter
     @Unique
     private static final DataParameter<Integer> STATE_SPECIAL = EntityDataManager.<Integer>createKey(EntityCreeper.class, DataSerializers.VARINT);
-
     @Unique private int creeperSpecialCooldown;
+    @Unique private int creeperSpecialIgnitedTime;
+    @Unique private int creeperSpecialInterrupted;
+
+
+//Special config values
+    @Unique private boolean creeperSpecialEnabled;
     @Unique private int creeperSpecialCooldownInterrupted;
     @Unique private int creeperSpecialCooldownAttacked;
     @Unique private int creeperSpecialCooldownFrustrated;
+    @Unique private int creeperSpecialCooldownOver;
     @Unique private int creeperSpecialCooldownStunned;
     @Unique private int creeperSpecialStunnedDuration;
-    @Unique private int creeperSpecialIgnitedTime;
-    @Unique private int creeperSpecialInterrupted;
-//New configurable parameter fields
     @Unique private int creeperSpecialIgnitedTimeMax;
     @Unique private int creeperSpecialInterruptedMax;
     @Unique private float creeperSpecialInterruptedDamage;
@@ -72,28 +76,32 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
         at = @At("RETURN")
     )
 //Injects take 
-//callbackinfo and original parameters
+//callbackinfo after original parameters
     private void constructorNewFields(World world, CallbackInfo callInfo)
     {
-//Set the special data parameter
+//Special handlers
         this.setCreeperStateSpecial(-1);
-
-//Add stunned task
-        EntityCreeper selfEntityCreeper = (EntityCreeper) (Object) this;
-        EntityLiving selfEntityLiving = (EntityLiving) (Object) this;
-        selfEntityLiving.tasks.addTask(0, new EntityAIStun(selfEntityCreeper));
-
-//These, by themselves,
-//won't do anything, but gotta have 
-//values to prevent null pointer exceptions
         this.creeperSpecialCooldown = 0;
+        this.creeperSpecialIgnitedTime = 0;
+        this.creeperSpecialInterrupted = 0;
+
+
+//Special configs
+        this.creeperSpecialEnabled = false;
         this.creeperSpecialCooldownInterrupted = 69420;
         this.creeperSpecialCooldownAttacked = 69420;
         this.creeperSpecialCooldownFrustrated = 69420;
+        this.creeperSpecialCooldownOver = 69420;
         this.creeperSpecialCooldownStunned = 69420;
         this.creeperSpecialStunnedDuration = 69420;
-        this.creeperSpecialIgnitedTime = 0;
-        this.creeperSpecialInterrupted = 0;        
+        this.creeperSpecialIgnitedTimeMax = 69420;
+        this.creeperSpecialInterruptedMax = 69420;
+        this.creeperSpecialInterruptedDamage = 69420;
+
+
+//Add stunned task
+        EntityLiving selfEntityLiving = (EntityLiving) (Object) this;
+        selfEntityLiving.tasks.addTask(0, new EntityAIStun(selfEntityLiving));        
     }
 
 
@@ -137,6 +145,8 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
         {
 //Increase special ignited time
             creeperSpecialIgnitedTime++;
+//Do special particle
+            this.creeperSpecialParticles();
         }
 //Else immediately shut down special swell
         else
@@ -145,6 +155,7 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
         }
     }
 
+
     @Inject
     (
         method = "writeEntityToNBT",
@@ -152,12 +163,23 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
     )
     private void writeNewNBT(NBTTagCompound compound, CallbackInfo callInfo)
     {
-//New NBT below
-        compound.setInteger("SpecialState", this.getCreeperStateSpecial());
+//Special handlers
+        compound.setInteger("CreeperSpecialState", this.getCreeperStateSpecial());
+        compound.setInteger("CreeperSpecialCooldown", this.creeperSpecialCooldown);
+        compound.setInteger("CreeperSpecialIgnitedTime", this.creeperSpecialIgnitedTime);
+        compound.setInteger("CreeperSpecialInterrupted", this.creeperSpecialInterrupted);
 
-        compound.setInteger("SpecialCooldown", this.creeperSpecialCooldown);
-        compound.setInteger("SpecialIgnitedTime", this.creeperSpecialIgnitedTime);
-        compound.setInteger("SpecialInterrupted", this.creeperSpecialInterrupted);
+//Special configs
+        compound.setBoolean("CreeperSpecialEnabled", this.creeperSpecialEnabled);
+        compound.setInteger("CreeperSpecialCooldownInterrupted", this.creeperSpecialCooldownInterrupted);
+        compound.setInteger("CreeperSpecialCooldownAttacked", this.creeperSpecialCooldownAttacked);
+        compound.setInteger("CreeperSpecialCooldownFrustrated", this.creeperSpecialCooldownFrustrated);
+        compound.setInteger("CreeperSpecialCooldownOver", this.creeperSpecialCooldownOver);
+        compound.setInteger("CreeperSpecialCooldownStunned", this.creeperSpecialCooldownStunned);
+        compound.setInteger("CreeperSpecialStunnedDuration", this.creeperSpecialStunnedDuration);
+        compound.setInteger("CreeperSpecialIgnitedTimeMax", this.creeperSpecialIgnitedTimeMax);
+        compound.setInteger("CreeperSpecialInterruptedMax", this.creeperSpecialInterruptedMax);
+        compound.setFloat("CreeperSpecialInterruptedDamage", this.creeperSpecialInterruptedDamage);
     }
 
 
@@ -168,19 +190,23 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
     )
     private void readNewNBT(NBTTagCompound compound, CallbackInfo callInfo)
     {
-//New NBT below
-        if (compound.hasKey("SpecialState")) {
-            this.setCreeperStateSpecial(compound.getInteger("SpecialState"));
-        }
-        if (compound.hasKey("SpecialCooldown")) {
-            this.creeperSpecialCooldown = compound.getInteger("SpecialCooldown");
-        }
-        if (compound.hasKey("SpecialIgnitedTime")) {
-            this.creeperSpecialIgnitedTime = compound.getInteger("SpecialIgnitedTime");
-        }
-        if (compound.hasKey("SpecialInterrupted")) {
-            this.creeperSpecialInterrupted = compound.getInteger("SpecialInterrupted");
-        }
+//Special handlers
+        if (compound.hasKey("CreeperSpecialState")) { this.setCreeperStateSpecial(compound.getInteger("CreeperSpecialState")); }
+        if (compound.hasKey("CreeperSpecialCooldown")) { this.creeperSpecialCooldown = compound.getInteger("CreeperSpecialCooldown"); }
+        if (compound.hasKey("CreeperSpecialIgnitedTime")) { this.creeperSpecialIgnitedTime = compound.getInteger("CreeperSpecialIgnitedTime"); }
+        if (compound.hasKey("CreeperSpecialInterrupted")) { this.creeperSpecialInterrupted = compound.getInteger("CreeperSpecialInterrupted"); }
+
+//Special configs
+        if (compound.hasKey("CreeperSpecialEnabled")) { this.creeperSpecialEnabled = compound.getBoolean("CreeperSpecialEnabled"); }
+        if (compound.hasKey("CreeperSpecialCooldownInterrupted")) { this.creeperSpecialCooldownInterrupted = compound.getInteger("CreeperSpecialCooldownInterrupted"); }
+        if (compound.hasKey("CreeperSpecialCooldownAttacked")) { this.creeperSpecialCooldownAttacked = compound.getInteger("CreeperSpecialCooldownAttacked"); }
+        if (compound.hasKey("CreeperSpecialCooldownFrustrated")) { this.creeperSpecialCooldownFrustrated = compound.getInteger("CreeperSpecialCooldownFrustrated"); }
+        if (compound.hasKey("CreeperSpecialCooldownOver")) { this.creeperSpecialCooldownOver = compound.getInteger("CreeperSpecialCooldownOver"); }
+        if (compound.hasKey("CreeperSpecialCooldownStunned")) { this.creeperSpecialCooldownStunned = compound.getInteger("CreeperSpecialCooldownStunned"); }
+        if (compound.hasKey("CreeperSpecialStunnedDuration")) { this.creeperSpecialStunnedDuration = compound.getInteger("CreeperSpecialStunnedDuration"); }
+        if (compound.hasKey("CreeperSpecialIgnitedTimeMax")) { this.creeperSpecialIgnitedTimeMax = compound.getInteger("CreeperSpecialIgnitedTimeMax"); }
+        if (compound.hasKey("CreeperSpecialInterruptedMax")) { this.creeperSpecialInterruptedMax = compound.getInteger("CreeperSpecialInterruptedMax"); }
+        if (compound.hasKey("CreeperSpecialInterruptedDamage")) { this.creeperSpecialInterruptedDamage = compound.getFloat("CreeperSpecialInterruptedDamage"); }
     }
 
 
@@ -214,6 +240,12 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
         PrimitiveMobsSoundEvents.ENTITY_CREEPER_NUKE, SoundCategory.NEUTRAL, 3.0F, 1.0F);
     }
 
+    public void creeperSpecialParticles()
+    {
+
+    }
+
+
 
 //New getters
 
@@ -229,17 +261,35 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
     }
 
 
-//Enables client-accessible persistent data for special attack
+
+//Special handlers
     public int getCreeperStateSpecial()
     {
         Entity selfEntity = (Entity) (Object) this;
         return ((Integer)selfEntity.getDataManager().get(STATE_SPECIAL)).intValue();
     }
 
-
     public int getCreeperSpecialCooldown()
     {
         return this.creeperSpecialCooldown;
+    }
+
+    public int getCreeperSpecialIgnitedTime()
+    {
+        return this.creeperSpecialIgnitedTime;
+    }
+
+    public int getCreeperSpecialInterrupted()
+    {
+        return this.creeperSpecialInterrupted;
+    }
+
+
+
+//Special config
+    public boolean getCreeperSpecialEnabled()
+    {
+        return this.creeperSpecialEnabled;
     }
 
     public int getCreeperSpecialCooldownInterrupted()
@@ -257,6 +307,11 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
         return this.creeperSpecialCooldownFrustrated;
     }
 
+    public int getCreeperSpecialCooldownOver()
+    {
+        return this.creeperSpecialCooldownOver;
+    }
+
     public int getCreeperSpecialCooldownStunned()
     {
         return this.creeperSpecialCooldownStunned;
@@ -266,18 +321,6 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
     {
         return this.creeperSpecialStunnedDuration;
     }
-
-    public int getCreeperSpecialIgnitedTime()
-    {
-        return this.creeperSpecialIgnitedTime;
-    }
-
-
-    public int getCreeperSpecialInterrupted()
-    {
-        return this.creeperSpecialInterrupted;
-    }
-
 
     public int getCreeperSpecialIgnitedTimeMax()
     {
@@ -295,7 +338,11 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
     }
 
 
+
+
 //New setters
+
+
 
 
     public void setCreeperIgnitedTime(int time)
@@ -309,13 +356,13 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
     }
 
 
+
+//Special handlers
     public void setCreeperStateSpecial(int state)
     {
         Entity selfEntity = (Entity) (Object) this;
         selfEntity.getDataManager().set(STATE_SPECIAL, Integer.valueOf(state));     
     } 
-
-
 //Short cooldown applications won't override long ones
     public void setCreeperSpecialCooldown(int cooldown)
     {
@@ -323,6 +370,24 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
         {
             this.creeperSpecialCooldown = cooldown;
         }
+    }
+
+    public void setCreeperSpecialIgnitedTime(int time)
+    {
+        this.creeperSpecialIgnitedTime = time;
+    }
+
+    public void setCreeperSpecialInterrupted(int interrupted)
+    {
+        this.creeperSpecialInterrupted = interrupted;
+    }
+
+
+
+//Special config
+    public void setCreeperSpecialEnabled(boolean enabled)
+    {
+        this.creeperSpecialEnabled = enabled;
     }
 
     public void setCreeperSpecialCooldownInterrupted(int cooldownInterrupted)
@@ -340,6 +405,11 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
         this.creeperSpecialCooldownFrustrated = cooldownFrustrated;
     }
 
+    public void setCreeperSpecialCooldownOver(int cooldownOver)
+    {
+        this.creeperSpecialCooldownOver = cooldownOver;
+    }
+
     public void setCreeperSpecialCooldownStunned(int cooldownStunned)
     {
         this.creeperSpecialCooldownStunned = cooldownStunned;
@@ -349,17 +419,6 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
     {
         this.creeperSpecialStunnedDuration = stunnedDuration;
     }
-
-    public void setCreeperSpecialIgnitedTime(int time)
-    {
-        this.creeperSpecialIgnitedTime = time;
-    }
-
-    public void setCreeperSpecialInterrupted(int interrupted)
-    {
-        this.creeperSpecialInterrupted = interrupted;
-    }
-
 
     public void setCreeperSpecialIgnitedTimeMax(int ignitedTimeMax)
     {

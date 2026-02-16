@@ -22,17 +22,14 @@ import net.daveyx0.primitivemobs.client.renderer.entity.RenderPrimitiveCreeper;
 import net.daveyx0.primitivemobs.client.renderer.entity.RenderPrimitiveTNTPrimed;
 import net.daveyx0.primitivemobs.client.renderer.entity.RenderSheepman;
 import net.daveyx0.primitivemobs.client.renderer.entity.RenderSkeletonWarrior;
-import net.daveyx0.primitivemobs.client.renderer.entity.RenderThownBlock;
 import net.daveyx0.primitivemobs.client.renderer.entity.RenderTreasureSlime;
 import net.daveyx0.primitivemobs.client.renderer.entity.RenderTrollager;
 import net.daveyx0.primitivemobs.client.renderer.entity.RenderVoidEye;
 import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigMobs;
 import net.daveyx0.primitivemobs.entity.item.EntityFlameSpit;
-import net.daveyx0.primitivemobs.entity.item.EntityFlameSpitBurst;
 import net.daveyx0.primitivemobs.entity.item.EntityPrimitiveTNTPrimed;
 import net.daveyx0.primitivemobs.entity.item.EntityPrimitiveThrowable;
 import net.daveyx0.primitivemobs.entity.item.EntitySpiderEgg;
-import net.daveyx0.primitivemobs.entity.item.EntityThrownBlock;
 import net.daveyx0.primitivemobs.entity.monster.EntityBabySpider;
 import net.daveyx0.primitivemobs.entity.monster.EntityBlazingJuggernaut;
 import net.daveyx0.primitivemobs.entity.monster.EntityBrainSlime;
@@ -95,8 +92,6 @@ public class PrimitiveMobsEntityRegistry extends MMEntityRegistry{
 	    	
 	    	addCustomEntities(EntityPrimitiveTNTPrimed.class, "primitive_tnt_primed", ++id, 64, 20, true);
 	    	addCustomEntities(EntityFlameSpit.class, "flame_spit", ++id, 64, 1, false);
-	    	addCustomEntities(EntityFlameSpitBurst.class, "flame_spit_burst", ++id, 64, 1, false);
-	    	addCustomEntities(EntityThrownBlock.class, "thrown_block", ++id, 64, 20, true);
 	    	addCustomEntities(EntityPrimitiveThrowable.class, "primitive_egg", ++id, 64, 20, true);
 	    	addCustomEntities(EntitySpiderEgg.class, "spider_egg", ++id, 64, 20, true);
 	    }
@@ -130,11 +125,9 @@ public class PrimitiveMobsEntityRegistry extends MMEntityRegistry{
 	    	RenderingRegistry.registerEntityRenderingHandler(EntityVoidEye.class, RenderVoidEye::new);
 	    	
 	    	RenderingRegistry.registerEntityRenderingHandler(EntityPrimitiveTNTPrimed.class, RenderPrimitiveTNTPrimed::new);
-	    	RenderingRegistry.registerEntityRenderingHandler(EntityThrownBlock.class, RenderThownBlock::new);
 	    	RenderingRegistry.registerEntityRenderingHandler(EntityPrimitiveThrowable.class, RenderFlyingItem::new);
 	    	RenderingRegistry.registerEntityRenderingHandler(EntitySpiderEgg.class, RenderFlyingItem::new);
 	    	RenderingRegistry.registerEntityRenderingHandler(EntityFlameSpit.class, RenderFlyingItem::new);
-	    	RenderingRegistry.registerEntityRenderingHandler(EntityFlameSpitBurst.class, RenderFlyingItem::new);
 	    }
 	    
 	    public static void addEntities(Class var1, String name1,  int entityid, int bkEggColor, int fgEggColor, boolean flag)

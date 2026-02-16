@@ -1,7 +1,6 @@
 package net.daveyx0.primitivemobs.entity.ai;
 
 import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.entity.EntityFireSpiral;
 import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -13,6 +12,7 @@ public class EntityAICreeperSwellSpecial extends EntityAIBase
     /** The creeper that is swelling. */
     EntityCreeper swellingCreeper;
     IMixinEntityCreeper swellingCreeperMixin;
+//  int particleTextureId;
 
     /**
      * The creeper's attack target. This is used for the changing of the creeper's state.
@@ -23,6 +23,8 @@ public class EntityAICreeperSwellSpecial extends EntityAIBase
     {
         this.swellingCreeper = entityCreeperIn;
         this.swellingCreeperMixin = (IMixinEntityCreeper) this.swellingCreeper;
+//      this.particleTextureId = particleId;
+
         this.setMutexBits(1);
     }
 
@@ -69,9 +71,12 @@ public class EntityAICreeperSwellSpecial extends EntityAIBase
 //Play sound
             this.swellingCreeperMixin.creeperSpecialAttemptSound(this.creeperAttackTarget.posX, this.creeperAttackTarget.posY, this.creeperAttackTarget.posZ);
 //Do fire spiral
-		    EntityFireSpiral fireSpiral = new EntityFireSpiral(this.swellingCreeper.getEntityWorld(), 
-                this.swellingCreeper.posX, this.swellingCreeper.posY, this.swellingCreeper.posZ, 1.0D, 4.0D, 0.15D, 48);
-		    this.swellingCreeper.getEntityWorld().spawnEntity(fireSpiral);
+/*
+		    EntityParticleSpiral particleSpiral = new EntityParticleSpiral(this.swellingCreeper.getEntityWorld(), 
+                this.swellingCreeper.posX, this.swellingCreeper.posY, this.swellingCreeper.posZ, false, 1.0D, 1.0D, 4.0D, 0.15D, this.particleTextureId);
+
+		    this.swellingCreeper.getEntityWorld().spawnEntity(particleSpiral);
+*/
         }    
 
     }

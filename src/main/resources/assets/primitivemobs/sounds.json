@@ -188,5 +188,21 @@
         [
             "primitivemobs:entity/creeper/party"
         ]
+    },
+    "entity.creeper.buffattempt":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "primitivemobs:entity/creeper/buffattempt"
+        ]
+    },
+    "entity.creeper.buffexecute":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "primitivemobs:entity/creeper/buffexecute"
+        ]
     }
 }

@@ -1,6 +1,6 @@
 package net.daveyx0.primitivemobs.interfacemixins;
 
-import net.daveyx0.primitivemobs.entity.ai.EntityAIStun;
+import org.sporotofpoorety.eternitymode.entity.ai.EntityAIStun;
 
 public interface IMixinEntityCreeper
 {
@@ -16,16 +16,17 @@ public interface IMixinEntityCreeper
     int getCreeperExplosionRadius();
 
     int getCreeperStateSpecial();
-
     int getCreeperSpecialCooldown();
-    int getCreeperSpecialCooldownInterrupted();
-    int getCreeperSpecialCooldownAttacked();
-    int getCreeperSpecialCooldownFrustrated();
-    int getCreeperSpecialCooldownStunned();
-    int getCreeperSpecialStunnedDuration();
     int getCreeperSpecialIgnitedTime();
     int getCreeperSpecialInterrupted();
 
+    boolean getCreeperSpecialEnabled();
+    int getCreeperSpecialCooldownInterrupted();
+    int getCreeperSpecialCooldownAttacked();
+    int getCreeperSpecialCooldownFrustrated();
+    int getCreeperSpecialCooldownOver();
+    int getCreeperSpecialCooldownStunned();
+    int getCreeperSpecialStunnedDuration();
     int getCreeperSpecialIgnitedTimeMax();
     int getCreeperSpecialInterruptedMax();
     float getCreeperSpecialInterruptedDamage();
@@ -37,16 +38,17 @@ public interface IMixinEntityCreeper
     void setCreeperExplosionRadius(int radius);
 
     void setCreeperStateSpecial(int state);
-
     void setCreeperSpecialCooldown(int cooldown);
-    void setCreeperSpecialCooldownInterrupted(int cooldownInterrupted);
-    void setCreeperSpecialCooldownAttacked(int cooldownAttacked);
-    void setCreeperSpecialCooldownFrustrated(int cooldownFrustrated);
-    void setCreeperSpecialCooldownStunned(int cooldownStunned);
-    void setCreeperSpecialStunnedDuration(int stunnedDuration);
     void setCreeperSpecialIgnitedTime(int time);
     void setCreeperSpecialInterrupted(int interrupted);
 
+    void setCreeperSpecialEnabled(boolean enabled);
+    void setCreeperSpecialCooldownInterrupted(int cooldownInterrupted);
+    void setCreeperSpecialCooldownAttacked(int cooldownAttacked);
+    void setCreeperSpecialCooldownFrustrated(int cooldownFrustrated);
+    void setCreeperSpecialCooldownOver(int cooldownOver);
+    void setCreeperSpecialCooldownStunned(int cooldownStunned);
+    void setCreeperSpecialStunnedDuration(int stunnedDuration);
     void setCreeperSpecialIgnitedTimeMax(int ignitedTimeMax);
     void setCreeperSpecialInterruptedMax(int interruptedMax);
     void setCreeperSpecialInterruptedDamage(float interruptedDamage);

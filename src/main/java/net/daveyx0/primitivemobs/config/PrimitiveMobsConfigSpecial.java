@@ -64,12 +64,11 @@ public class PrimitiveMobsConfigSpecial {
     public static int festiveCreeperLineAttackAmountCharged;
     public static double festiveCreeperLineAttackExtentCharged;
     public static boolean festiveCreeperSpecialEnabled;
-    public static int festiveCreeperSpecialCooldownInitial;
     public static int festiveCreeperSpecialCooldownInterrupted;
     public static int festiveCreeperSpecialCooldownAttacked;
     public static int festiveCreeperSpecialCooldownFrustrated;
-    public static int festiveCreeperSpecialCooldownStunned;
     public static int festiveCreeperSpecialCooldownOver;
+    public static int festiveCreeperSpecialCooldownStunned;
     public static int festiveCreeperSpecialStunnedDuration;
     public static int festiveCreeperSpecialIgnitedTimeMax;
     public static double festiveCreeperSpecialInterruptedDamage;
@@ -87,14 +86,14 @@ public class PrimitiveMobsConfigSpecial {
 	public static String[] filchStealLoot;
 	public static String[] filchSpawnLoot;
 	public static int[] filchSpawnLootWeights;
-    public static int flameSpewerPrecumCountdownMax;
-    public static int flameSpewerCumLifetime;
-    public static int flameSpewerCumParticles;
-    public static int flameSpewerForeskinProtractWhen;
-    public static int flameSpewerForeskinRetractWhen;
-    public static int flameSpewerCumRapidfireShots;
-    public static int flameSpewerCumRapidfireInterval;
-    public static double flameSpewerCumRapidfireSpread;
+    public static int flameSpewerPreAttackCountdownMax;
+    public static int flameSpewerShotLifetime;
+    public static int flameSpewerShotParticles;
+    public static int flameSpewerGoInvulnerableWhen;
+    public static int flameSpewerGoVulnerableWhen;
+    public static int flameSpewerAttackRapidfireShots;
+    public static int flameSpewerAttackRapidfireInterval;
+    public static double flameSpewerAttackRapidfireSpread;
 	public static boolean lostMinerSounds;
 	public static int maxSpiderFamilySize;
     public static double harpyAttackDamage;
@@ -112,10 +111,10 @@ public class PrimitiveMobsConfigSpecial {
     public static double rocketCreeperDetonationDistance;
     public static int rocketCreeperDetonationTimerMax;
     public static boolean rocketCreeperSpecialEnabled;
-    public static int rocketCreeperSpecialCooldownInitial;
     public static int rocketCreeperSpecialCooldownInterrupted;
     public static int rocketCreeperSpecialCooldownAttacked;
     public static int rocketCreeperSpecialCooldownFrustrated;
+    public static int rocketCreeperSpecialCooldownOver;
     public static int rocketCreeperSpecialCooldownStunned;
     public static int rocketCreeperSpecialStunnedDuration;
     public static int rocketCreeperSpecialIgnitedTimeMax;
@@ -142,18 +141,20 @@ public class PrimitiveMobsConfigSpecial {
     public static int[] supportCreeperBuffStrengthList;
     public static int[] supportCreeperBuffStrengthListPowered;
     public static boolean supportCreeperSpecialEnabled;
-    public static int supportCreeperSpecialCooldownInitial;
     public static int supportCreeperSpecialCooldownInterrupted;
     public static int supportCreeperSpecialCooldownAttacked;
     public static int supportCreeperSpecialCooldownFrustrated;
+    public static int supportCreeperSpecialCooldownOver;
     public static int supportCreeperSpecialCooldownStunned;
+    public static int supportCreeperSpecialStunnedDuration;
     public static int supportCreeperSpecialIgnitedTimeMax;
     public static double supportCreeperSpecialInterruptedDamage;
     public static int supportCreeperSpecialInterruptedMax;
-    public static String[] supportCreeperSpecialBuffList;
-    public static int[] supportCreeperSpecialBuffLengthList;
-    public static int[] supportCreeperSpecialBuffStrengthList;
-    public static int[] supportCreeperSpecialBuffStrengthListPowered;
+    public static int supportCreeperSpecialChunkRadius;
+    public static String[] supportCreeperBuffListSpecial;
+    public static int[] supportCreeperBuffLengthListSpecial;
+    public static int[] supportCreeperBuffStrengthListSpecial;
+    public static int[] supportCreeperBuffStrengthListPoweredSpecial;
 	public static String[] treasureSlimeSpawnLoot;
 	public static int[] treasureSlimeSpawnLootWeights;
     public static double trollMeleeDistance;
@@ -163,7 +164,6 @@ public class PrimitiveMobsConfigSpecial {
 	public static boolean trollDestruction;
 	public static double trollDestructionPower;
 	public static double trollNondestructionPower;
-	public static double trollThrownScale;
 	public static boolean trollTurnsToStone;
 	public static boolean hauntedToolFullDurability;
 	public static boolean groveSpritesPlant;
@@ -172,7 +172,9 @@ public class PrimitiveMobsConfigSpecial {
 	public static int mimicSpawnRate;
 	public static int[] lostMinerLootRange;
 
-	public static void load(Configuration config) {
+
+	public static void load(Configuration config) 
+    {
 		String category1 = "Mob Specific Settings";
 
 //Adds config category
@@ -236,12 +238,11 @@ public class PrimitiveMobsConfigSpecial {
         festiveCreeperLineAttackAmountCharged = config.get(category1, "Festive Creeper line attack amount (charged)", 10, "Charged Festive Creeper line attack throws this many TNTs at once").getInt();
         festiveCreeperLineAttackExtentCharged = config.get(category1, "Festive Creeper line attack extent (charged)", 2.5, "Charged Festive Creeper line attack should extend this many times farther than the target's distance").getDouble();
         festiveCreeperSpecialEnabled = config.get(category1, "Festive Creeper party attack enabled", true, "Festive Creeper party attack where it sprays TNT everywhere enabled or not").getBoolean();
-        festiveCreeperSpecialCooldownInitial = config.get(category1, "Festive Creeper party cooldown initial", 40, "Festive Creeper spawns with this long of a cooldown in ticks before being able to first charge its party attack").getInt();
         festiveCreeperSpecialCooldownInterrupted = config.get(category1, "Festive Creeper party cooldown interrupted", 100, "Festive Creeper party attack has this long of a cooldown in ticks when it loses line of sight to the target").getInt();
         festiveCreeperSpecialCooldownAttacked = config.get(category1, "Festive Creeper party cooldown attacked", 100, "Festive Creeper party attack has this long of a cooldown in ticks when it gets hit by a melee attack or arrow").getInt();
         festiveCreeperSpecialCooldownFrustrated = config.get(category1, "Festive Creeper party cooldown frustrated", 400, "Festive Creeper party attack has this long of a cooldown in ticks when it gets interrupted too many times doing it and gives up").getInt();
-        festiveCreeperSpecialCooldownStunned = config.get(category1, "Festive Creeper party cooldown stunned", 400, "Festive Creeper party attack has this long of a cooldown in ticks when it gets stunned mid-swelling").getInt();
         festiveCreeperSpecialCooldownOver = config.get(category1, "Festive Creeper party cooldown when over", 400, "Festive Creeper party attack has this long of a cooldown in ticks when it's over").getInt();
+        festiveCreeperSpecialCooldownStunned = config.get(category1, "Festive Creeper party cooldown stunned", 400, "Festive Creeper party attack has this long of a cooldown in ticks when it gets stunned mid-swelling").getInt();
         festiveCreeperSpecialStunnedDuration = config.get(category1, "Festive Creeper party stun duration", 100, "Festive Creeper stun lasts this long in ticks").getInt();
         festiveCreeperSpecialIgnitedTimeMax = config.get(category1, "Festive Creeper party ignite time", 100, "Festive Creeper spends this many ticks charging its party attack").getInt();
         festiveCreeperSpecialInterruptedDamage = config.get(category1, "Festive Creeper party interruption damage", 1.0, "Festive Creeper has to take this much damage to get its party attack interrupted").getDouble();
@@ -259,14 +260,14 @@ public class PrimitiveMobsConfigSpecial {
         filchStealLoot = config.get(category1, "Filch Lizard steal loot", new String[]{"minecraft:diamond", "minecraft:emerald", "minecraft:ender_pearl", "minecraft:flint", "minecraft:gold_ingot", "minecraft:iron_ingot", "minecraft:lapis_ore"}, "Items by ID which a Filch Lizard will steal").getStringList();
         filchSpawnLoot = config.get(category1, "Filch Lizard spawn loot", new String[]{"minecraft:diamond", "minecraft:emerald", "minecraft:ender_pearl", "minecraft:flint", "minecraft:gold_ingot", "minecraft:iron_ingot", "minecraft:lapis_ore"}, "Items by ID which a Filch Lizard can spawn with").getStringList();
 		filchSpawnLootWeights = config.get(category1, "Filch Lizard spawn loot weights", new int[]{1, 1, 2, 8, 3, 6, 4}, "Probability weights for each Filch Lizard spawn loot item").getIntList();
-        flameSpewerPrecumCountdownMax = config.get(category1, "Flame Spewer attack countdown duration total", 100, "Flame Spewer has total countdown this long between attacks").getInt();
-        flameSpewerCumLifetime = config.get(category1, "Flame Spewer small fireball lifetime", 100, "Flame Spewer small fireballs last this many ticks").getInt();
-        flameSpewerCumParticles = config.get(category1, "Flame Spewer small fireball particle density", 10, "Flame Spewer small fireballs make this many particles").getInt();
-        flameSpewerForeskinProtractWhen = config.get(category1, "Flame Spewer countdown invulnerability trigger", 100, "Flame Spewer goes invulnerable when countdown between attacks is at this many ticks").getInt();
-        flameSpewerForeskinRetractWhen = config.get(category1, "Flame Spewer countdown vulnerability trigger", 50, "Flame Spewer goes vulnerable when countdown between attacks is at this many ticks").getInt();
-        flameSpewerCumRapidfireShots = config.get(category1, "Flame Spewer rapidfire shot max", 10, "Flame Spewer rapidfire fireballs shoots this many").getInt();
-        flameSpewerCumRapidfireInterval = config.get(category1, "Flame Spewer rapidfire fireball interval", 3, "Flame Spewer rapidfire fireball interval in ticks").getInt();
-        flameSpewerCumRapidfireSpread = config.get(category1, "Flame Spewer rapidfire fireball spread", 0.02, "Flame Spewer rapidfire fireball spread factor").getDouble();
+        flameSpewerPreAttackCountdownMax = config.get(category1, "Flame Spewer attack countdown duration total", 100, "Flame Spewer has total countdown this long between attacks").getInt();
+        flameSpewerShotLifetime = config.get(category1, "Flame Spewer small fireball lifetime", 100, "Flame Spewer small fireballs last this many ticks").getInt();
+        flameSpewerShotParticles = config.get(category1, "Flame Spewer small fireball particle density", 10, "Flame Spewer small fireballs make this many particles").getInt();
+        flameSpewerGoInvulnerableWhen = config.get(category1, "Flame Spewer countdown invulnerability trigger", 100, "Flame Spewer goes invulnerable when countdown between attacks is at this many ticks").getInt();
+        flameSpewerGoVulnerableWhen = config.get(category1, "Flame Spewer countdown vulnerability trigger", 50, "Flame Spewer goes vulnerable when countdown between attacks is at this many ticks").getInt();
+        flameSpewerAttackRapidfireShots = config.get(category1, "Flame Spewer rapidfire shot max", 10, "Flame Spewer rapidfire fireballs shoots this many").getInt();
+        flameSpewerAttackRapidfireInterval = config.get(category1, "Flame Spewer rapidfire fireball interval", 3, "Flame Spewer rapidfire fireball interval in ticks").getInt();
+        flameSpewerAttackRapidfireSpread = config.get(category1, "Flame Spewer rapidfire fireball spread", 0.02, "Flame Spewer rapidfire fireball spread factor").getDouble();
 		maxSpiderFamilySize = config.get(category1, "Max Spider Family Size", 6, "Set the maximum amount of Baby Spiders that can potentially spawn with a Mother Spider").getInt();
         harpyAttackDamage = config.get(category1, "Harpy attack damage", 0.0, "How much damage does the Harpy do when grabbing a target").getDouble();
         harpyFlyingSpeed = config.get(category1, "Harpy flying speed", 0.5000000059604645, "Harpy base movement speed (when flying)").getDouble();
@@ -284,10 +285,10 @@ public class PrimitiveMobsConfigSpecial {
         rocketCreeperDetonationDistance = config.get(category1, "Rocket Creeper max explode distance", 5.0, "How close a Rocket Creeper has to be before swelling up to do a normal explosion").getDouble();
         rocketCreeperDetonationTimerMax = config.get(category1, "Rocket Creeper explode timer", 15, "Rocket Creeper spends this many ticks charging to explode normally").getInt();
         rocketCreeperSpecialEnabled = config.get(category1, "Rocket Creeper homing attack enabled", true, "Rocket Creeper homing attack where it homes in like a missile enabled or not").getBoolean();
-        rocketCreeperSpecialCooldownInitial = config.get(category1, "Rocket Creeper homing cooldown initial", 40, "Rocket Creeper spawns with this long of a cooldown in ticks before being able to first charge its homing attack").getInt();
         rocketCreeperSpecialCooldownInterrupted = config.get(category1, "Rocket Creeper homing cooldown interrupted", 100, "Rocket Creeper homing attack has this long of a cooldown in ticks when it loses line of sight to the target").getInt();
         rocketCreeperSpecialCooldownAttacked = config.get(category1, "Rocket Creeper homing cooldown attacked", 100, "Rocket Creeper homing attack has this long of a cooldown in ticks when it gets hit by a melee attack or arrow").getInt();
         rocketCreeperSpecialCooldownFrustrated = config.get(category1, "Rocket Creeper homing cooldown frustrated", 400, "Rocket Creeper homing attack has this long of a cooldown in ticks when it gets interrupted too many times doing it and gives up").getInt();
+        rocketCreeperSpecialCooldownOver = config.get(category1, "Rocket Creeper homing cooldown when over", 400, "Rocket Creeper homing attack has this long of a cooldown in ticks when it's over").getInt();
         rocketCreeperSpecialCooldownStunned = config.get(category1, "Rocket Creeper homing cooldown stunned", 400, "Rocket Creeper homing attack has this long of a cooldown in ticks when it gets stunned mid-swelling").getInt();
         rocketCreeperSpecialStunnedDuration = config.get(category1, "Rocket Creeper homing stun duration", 100, "Rocket Creeper stun lasts this long in ticks").getInt();
         rocketCreeperSpecialIgnitedTimeMax = config.get(category1, "Rocket Creeper homing ignite time", 100, "Rocket Creeper spends this many ticks charging its homing attack").getInt();
@@ -314,18 +315,20 @@ public class PrimitiveMobsConfigSpecial {
         supportCreeperBuffStrengthList = config.get(category1, "Support Creeper buff strength list (base)", new int[]{1, 1, 1}, "Support Creeper buffs have these amplifiers when not charged").getIntList();
         supportCreeperBuffStrengthListPowered = config.get(category1, "Support Creeper buff strength list (charged)", new int[]{2, 2, 2}, "Support Creeper buffs have these amplifiers when charged").getIntList();
         supportCreeperSpecialEnabled = config.get(category1, "Support Creeper special attack enabled", true, "Support Creeper special attack where it buffs mobs in a wide radius enabled or not").getBoolean();
-        supportCreeperSpecialCooldownInitial = config.get(category1, "Support Creeper special cooldown initial", 40, "Support Creeper spawns with this long of a cooldown in ticks before being able to first charge its special attack").getInt();
         supportCreeperSpecialCooldownInterrupted = config.get(category1, "Support Creeper special cooldown interrupted", 100, "Support Creeper special attack has this long of a cooldown in ticks when it loses line of sight to the target").getInt();
         supportCreeperSpecialCooldownAttacked = config.get(category1, "Support Creeper special cooldown attacked", 100, "Support Creeper special attack has this long of a cooldown in ticks when it gets hit by a melee attack or arrow").getInt();
         supportCreeperSpecialCooldownFrustrated = config.get(category1, "Support Creeper special cooldown frustrated", 400, "Support Creeper special attack has this long of a cooldown in ticks when it gets interrupted too many times doing it and gives up").getInt();
+        supportCreeperSpecialCooldownOver = config.get(category1, "Support Creeper special cooldown when over", 400, "Festive Creeper special attack has this long of a cooldown in ticks when it's over").getInt();
         supportCreeperSpecialCooldownStunned = config.get(category1, "Support Creeper special cooldown stunned", 400, "Support Creeper special attack has this long of a cooldown in ticks when it gets stunned mid-swelling").getInt();
+        supportCreeperSpecialStunnedDuration = config.get(category1, "Support Creeper special stun duration", 100, "Support Creeper stun lasts this long in ticks").getInt();
         supportCreeperSpecialIgnitedTimeMax = config.get(category1, "Support Creeper special ignite time", 100, "Support Creeper spends this many ticks charging its special attack").getInt();
         supportCreeperSpecialInterruptedDamage = config.get(category1, "Support Creeper special interruption damage", 1.0, "Support Creeper has to take this much damage to get its special attack interrupted").getDouble();
         supportCreeperSpecialInterruptedMax = config.get(category1, "Support Creeper special interruption max", 5, "If a Support Creeper is interrupted this many times while preparing its special attack it gives up temporarily").getInt();
-        supportCreeperSpecialBuffList = config.get(category1, "Support Creeper special attack buff list", new String[]{"minecraft:fire_resistance", "minecraft:speed", "minecraft:strength"}, "Support Creeper special attack applies these buffs").getStringList();
-        supportCreeperSpecialBuffLengthList = config.get(category1, "Support Creeper special attack buff length list", new int[]{60, 60, 60}, "Support Creeper special attack buffs have these lengths in ticks").getIntList();
-        supportCreeperSpecialBuffStrengthList = config.get(category1, "Support Creeper special attack buff strength list (base)", new int[]{1, 1, 1}, "Support Creeper special attack buffs have these amplifiers when not charged").getIntList();
-        supportCreeperSpecialBuffStrengthListPowered = config.get(category1, "Support Creeper special attack buff strength list (charged)", new int[]{2, 2, 2}, "Support Creeper special attack buffs have these amplifiers when charged").getIntList();
+        supportCreeperSpecialChunkRadius = config.get(category1, "Support Creeper special buff chunk radius", 2, "Support Creeper special attacks buffs mobs in this chunk radius").getInt();
+        supportCreeperBuffListSpecial = config.get(category1, "Support Creeper special attack buff list", new String[]{"minecraft:fire_resistance", "minecraft:speed", "minecraft:strength"}, "Support Creeper special attack applies these buffs").getStringList();
+        supportCreeperBuffLengthListSpecial = config.get(category1, "Support Creeper special attack buff length list", new int[]{1200, 1200, 1200}, "Support Creeper special attack buffs have these lengths in ticks").getIntList();
+        supportCreeperBuffStrengthListSpecial = config.get(category1, "Support Creeper special attack buff strength list (base)", new int[]{1, 1, 1}, "Support Creeper special attack buffs have these amplifiers when not charged").getIntList();
+        supportCreeperBuffStrengthListPoweredSpecial = config.get(category1, "Support Creeper special attack buff strength list (charged)", new int[]{2, 2, 2}, "Support Creeper special attack buffs have these amplifiers when charged").getIntList();
         treasureSlimeSpawnLoot = config.get(category1, "Treasure Slime spawn loot", new String[]{"minecraft:apple", "minecraft:cookie", "minecraft:gold_ingot", "minecraft:iron_ingot", "minecraft:redstone", "minecraft:coal", "minecraft:diamond", "minecraft:cake", "minecraft:carrot", "minecraft:golden_apple", "minecraft:ender_pearl", "minecraft:saddle", "minecraft:magma_cream", "minecraft:ender_eye", "minecraft:blaze_powder", "minecraft:record_wait"}, "Items by ID which a Treasure Slime can spawn with").getStringList();
 		treasureSlimeSpawnLootWeights = config.get(category1, "Treasure Slime spawn loot weights", new int[]{10, 10, 5, 8, 5, 8, 1, 2, 6, 1, 4, 1, 2, 1, 3, 1}, "Probability weights for each Treasure Slime spawn loot item").getIntList();
         trollMeleeDistance = config.get(category1, "Trollager distance to melee", 2.5, "Trollager can melee from this far").getDouble();
@@ -335,7 +338,6 @@ public class PrimitiveMobsConfigSpecial {
 		trollDestruction = config.get(category1, "Trollager can destroy terrain", true, "Enable/Disable if the Trollager can destroy terrain with its attack").getBoolean();
 		trollDestructionPower = config.get(category1, "Trollager explosion power", 3.0, "Trollager smash attack explosion power").getDouble();
 		trollNondestructionPower = config.get(category1, "Trollager explosion power (non-destructive)", 0.0, "If higher than 0, Trollager explosion attack comes with an extra non-destructive explosion that can be used to extend the attack").getDouble();
-		trollThrownScale = config.get(category1, "Trollager thrown block scale", 1.0, "Trollager block throw attack scale").getDouble();
 	    trollTurnsToStone = config.get(category1, "Trollager turns to stone in the sun", true, "Whether the Trollager turns to stone in sunlight").getBoolean();
 		lostMinerLootRange = config.get(category1, "Lost Miner emerald loot range", new int[]{2,2}, "Change the amount of emeralds you receive when saving a Lost Miner. First number = minimum. Second number = variable addition").getIntList();
 		hauntedToolFullDurability = config.get(category1, "Haunted Tool drop full durability", false, "Enable/Disable if Haunted Tools should drop full durability items.").getBoolean();
@@ -641,11 +643,6 @@ public class PrimitiveMobsConfigSpecial {
         return festiveCreeperSpecialEnabled;
     }
 
-    public static int getFestiveCreeperSpecialCooldownInitial()
-    {
-        return festiveCreeperSpecialCooldownInitial;
-    }
-
     public static int getFestiveCreeperSpecialCooldownInterrupted()
     {
         return festiveCreeperSpecialCooldownInterrupted;
@@ -661,20 +658,21 @@ public class PrimitiveMobsConfigSpecial {
         return festiveCreeperSpecialCooldownFrustrated;
     }
 
-    public static int getFestiveCreeperSpecialCooldownStunned()
-    {
-        return festiveCreeperSpecialCooldownStunned;
-    }
-
     public static int getFestiveCreeperSpecialCooldownOver()
     {
         return festiveCreeperSpecialCooldownOver;
+    }
+
+    public static int getFestiveCreeperSpecialCooldownStunned()
+    {
+        return festiveCreeperSpecialCooldownStunned;
     }
 
     public static int getFestiveCreeperSpecialStunnedDuration()
     {
         return festiveCreeperSpecialStunnedDuration;
     }
+
 
     public static int getFestiveCreeperSpecialIgnitedTimeMax()
     {
@@ -756,44 +754,44 @@ public class PrimitiveMobsConfigSpecial {
 		return filchSpawnLootWeights;
 	}
 
-    public static int getFlameSpewerPrecumCountdownMax()
+    public static int getFlameSpewerPreAttackCountdownMax()
     {
-        return flameSpewerPrecumCountdownMax;
+        return flameSpewerPreAttackCountdownMax;
     }
 
-    public static int getFlameSpewerCumLifetime()
+    public static int getFlameSpewerShotLifetime()
     {
-        return flameSpewerCumLifetime;
+        return flameSpewerShotLifetime;
     }
 
-    public static int getFlameSpewerCumParticles()
+    public static int getFlameSpewerShotParticles()
     {
-        return flameSpewerCumParticles;
+        return flameSpewerShotParticles;
     }
 
-    public static int getFlameSpewerForeskinProtractWhen()
+    public static int getFlameSpewerGoInvulnerableWhen()
     {
-        return flameSpewerForeskinProtractWhen;
+        return flameSpewerGoInvulnerableWhen;
     }
 
-    public static int getFlameSpewerForeskinRetractWhen()
+    public static int getFlameSpewerGoVulnerableWhen()
     {
-        return flameSpewerForeskinRetractWhen;
+        return flameSpewerGoVulnerableWhen;
     }
 
-    public static int getflameSpewerCumRapidfireShots()
+    public static int getflameSpewerAttackRapidfireShots()
     {
-        return flameSpewerCumRapidfireShots;
+        return flameSpewerAttackRapidfireShots;
     }
 
-    public static int getFlameSpewerCumRapidfireInterval()
+    public static int getFlameSpewerAttackRapidfireInterval()
     {
-        return flameSpewerCumRapidfireInterval;
+        return flameSpewerAttackRapidfireInterval;
     }
 
-    public static double getFlameSpewerCumRapidfireSpread()
+    public static double getFlameSpewerAttackRapidfireSpread()
     {
-        return flameSpewerCumRapidfireSpread;
+        return flameSpewerAttackRapidfireSpread;
     }
 	
 	public static int getMaxSpiderFamilySize()
@@ -886,11 +884,6 @@ public class PrimitiveMobsConfigSpecial {
         return rocketCreeperSpecialEnabled;
     }
     
-    public static int getRocketCreeperSpecialCooldownInitial()
-    {
-        return rocketCreeperSpecialCooldownInitial;
-    }
-    
     public static int getRocketCreeperSpecialCooldownInterrupted()
     {
         return rocketCreeperSpecialCooldownInterrupted;
@@ -904,6 +897,11 @@ public class PrimitiveMobsConfigSpecial {
     public static int getRocketCreeperSpecialCooldownFrustrated()
     {
         return rocketCreeperSpecialCooldownFrustrated;
+    }
+
+    public static int getRocketCreeperSpecialCooldownOver()
+    {
+        return rocketCreeperSpecialCooldownOver;
     }
 
     public static int getRocketCreeperSpecialCooldownStunned()
@@ -1036,11 +1034,6 @@ public class PrimitiveMobsConfigSpecial {
         return supportCreeperSpecialEnabled;
     }
 
-    public static int getSupportCreeperSpecialCooldownInitial()
-    {
-        return supportCreeperSpecialCooldownInitial;
-    }
-
     public static int getSupportCreeperSpecialCooldownInterrupted()
     {
         return supportCreeperSpecialCooldownInterrupted;
@@ -1056,10 +1049,21 @@ public class PrimitiveMobsConfigSpecial {
         return supportCreeperSpecialCooldownFrustrated;
     }
 
+    public static int getSupportCreeperSpecialCooldownOver()
+    {
+        return supportCreeperSpecialCooldownOver;
+    }
+
     public static int getSupportCreeperSpecialCooldownStunned()
     {
         return supportCreeperSpecialCooldownStunned;
     }
+
+    public static int getSupportCreeperSpecialStunnedDuration()
+    {
+        return supportCreeperSpecialStunnedDuration;
+    }
+
     
     public static int getSupportCreeperSpecialIgnitedTimeMax()
     {
@@ -1076,24 +1080,29 @@ public class PrimitiveMobsConfigSpecial {
         return supportCreeperSpecialInterruptedMax;
     }
 
-    public static String[] getSupportCreeperSpecialBuffList()
+    public static int getSupportCreeperSpecialChunkRadius()
     {
-        return supportCreeperSpecialBuffList;
+        return supportCreeperSpecialChunkRadius;
     }
 
-    public static int[] getSupportCreeperSpecialBuffLengthList()
+    public static String[] getSupportCreeperBuffListSpecial()
     {
-        return supportCreeperSpecialBuffLengthList;
+        return supportCreeperBuffListSpecial;
     }
 
-    public static int[] getSupportCreeperSpecialBuffStrengthList()
+    public static int[] getSupportCreeperBuffLengthListSpecial()
     {
-        return supportCreeperSpecialBuffStrengthList;
+        return supportCreeperBuffLengthListSpecial;
     }
 
-    public static int[] getSupportCreeperSpecialBuffStrengthListPowered()
+    public static int[] getSupportCreeperBuffStrengthListSpecial()
     {
-        return supportCreeperSpecialBuffStrengthListPowered;
+        return supportCreeperBuffStrengthListSpecial;
+    }
+
+    public static int[] getSupportCreeperBuffStrengthListPoweredSpecial()
+    {
+        return supportCreeperBuffStrengthListPoweredSpecial;
     }
 
 	public static String[] getTreasureSlimeSpawnLoot()
@@ -1139,11 +1148,6 @@ public class PrimitiveMobsConfigSpecial {
 	public static double getTrollNondestructionPower()
 	{
 		return trollNondestructionPower;
-	}
-
-	public static double getTrollThrownScale()
-	{
-		return trollThrownScale;
 	}
 
     public static boolean getTrollTurnsToStone()

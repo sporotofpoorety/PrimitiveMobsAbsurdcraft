@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -31,58 +32,16 @@ import net.minecraft.util.DamageSource;
 
 import net.minecraft.world.World;
 
+import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityLiving;
+
+
+
 
 //Mixin this class
 @Mixin(value = EntityMob.class, remap = true)
 //Abstract since mixins should not be instantiated
 public abstract class MixinEntityMob implements IMixinEntityMob
 {
-
-    @Unique
-//Named this way for compatibility
-    private static final DataParameter<Boolean> IS_ABSURDCRAFT_STUNNED = EntityDataManager.<Boolean>createKey(EntityMob.class, DataSerializers.BOOLEAN);
-
-
-//Named this way for compatibility
-    @Unique private int absurdcraftStunnedTimer;
-
-
-
-
-    @Inject
-    (
-//Internal representation of constructor
-        method = "<init>",
-//At return
-        at = @At("RETURN")
-    )
-//Injects take 
-//callbackinfo and original parameters
-    private void constructorNewFields(World world, CallbackInfo callInfo)
-    {
-//Set the special data parameter
-        this.setAbsurdcraftStunned(false);       
-    }
-
-
-    @Inject
-    (
-//Inject in this method
-        method = "onUpdate",
-//At tail (low priority after all)
-        at = @At("TAIL")
-    )
-    private void onUpdateStunTimer(CallbackInfo callInfo)
-    {
-        if(this.absurdcraftStunnedTimer > 0)
-        {
-            if(--absurdcraftStunnedTimer <= 0)
-            {
-                this.setAbsurdcraftStunned(false);
-            }
-        }
-    }
-
 
 //Operation
     @WrapWithCondition
@@ -121,6 +80,56 @@ public abstract class MixinEntityMob implements IMixinEntityMob
     }
 
 
+/*
+    @WrapWithCondition
+    (
+        method = "despawnEntity",
+        at = 
+        @At
+        (
+            value = "INVOKE",
+            target = "Lnet/minecraft/entity/EntityMob;ut$dropEquipmentAndDespawn()V",
+            remap = false
+        ),
+//Slice
+        slice = @Slice(
+//From this reference point
+            from = 
+            @At
+            (
+                value = "CONSTANT",
+                args = "doubleValue=16384.0D"
+            ),
+//To another, later reference point
+            to = 
+            @At
+            (
+                value = "CONSTANT",
+                args = "doubleValue=1024.0D"
+            )
+        )
+    )*/
+/*
+    @WrapWithCondition
+    (
+        method = "despawnEntity",
+        at = 
+        @At
+        (
+            value = "INVOKE",
+            target = "Lnet/minecraft/entity/EntityMob;ut$dropEquipmentAndDespawn()V",
+            remap = false,
+            ordinal = 0
+        ),
+        require = 0
+    )
+    private boolean flyingHelperMob(EntityMob self) 
+    {
+        return false;
+    }
+*/
+
+
     @Inject
     (
         method = "attackEntityFrom",
@@ -144,13 +153,18 @@ public abstract class MixinEntityMob implements IMixinEntityMob
                     EntityCreeper selfEntityCreeper = (EntityCreeper) (Object) this;
 //Play sound
                     selfEntity.playSound(PrimitiveMobsSoundEvents.ENTITY_CREEPER_DIZZY, 3.0F, 1.0F);
-//Interrupt normal swell (bugfix)
-                    selfCreeperMixin.resetCreeper();
 //Apply special cooldown
                     selfCreeperMixin.setCreeperSpecialCooldown(selfCreeperMixin.getCreeperSpecialCooldownStunned());
 //And apply stun
-                    this.setAbsurdcraftStunned(true);
-                    this.absurdcraftStunnedTimer = selfCreeperMixin.getCreeperSpecialStunnedDuration();
+                    IMixinEntityLiving selfEntityLivingMixin = (IMixinEntityLiving) (Object) this;
+
+                    selfEntityLivingMixin.setAbsurdcraftStunned(true);
+
+                    if(selfEntityLivingMixin.getAbsurdcraftStunned())
+                    {
+                        Entity living = (Entity) (Object) this;
+                    }
+                    selfEntityLivingMixin.setAbsurdcraftStunnedTimer(selfCreeperMixin.getCreeperSpecialStunnedDuration());
                 }
 //If just attacked normally there's a smaller cooldown 
                 else
@@ -164,6 +178,8 @@ public abstract class MixinEntityMob implements IMixinEntityMob
     }
 
 
+
+
 //New misc methods
 
 
@@ -171,42 +187,6 @@ public abstract class MixinEntityMob implements IMixinEntityMob
     public boolean isTamed()
     {
         return false;
-    }
-
-
-//New getters
-
-
-//Named this way for compatibility
-    public DataParameter<Boolean> getAbsurdcraftStunnedDataParameter()
-    {
-        return this.IS_ABSURDCRAFT_STUNNED; 
-    }
-
-    public boolean getAbsurdcraftStunned()
-    {
-        Entity selfEntity = (Entity) (Object) this;
-        return ((Boolean)selfEntity.getDataManager().get(IS_ABSURDCRAFT_STUNNED)).booleanValue();
-    }
-
-    public int getAbsurdcraftStunnedTimer()
-    {
-        return this.absurdcraftStunnedTimer;
-    }
-
-
-//New setters
-
-
-    public void setAbsurdcraftStunned(boolean isStunned)
-    {
-        Entity selfEntity = (Entity) (Object) this;
-        selfEntity.getDataManager().set(IS_ABSURDCRAFT_STUNNED, Boolean.valueOf(isStunned)); 
-    }
-
-    public void setAbsurdcraftStunnedTimer(int time)
-    {
-        this.absurdcraftStunnedTimer = time;
     }
 
 }

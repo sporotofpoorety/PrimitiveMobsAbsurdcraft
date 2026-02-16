@@ -13,7 +13,6 @@ import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
 import net.daveyx0.primitivemobs.core.TaskUtils;
 import net.daveyx0.primitivemobs.entity.IAnimatedMob;
 import net.daveyx0.primitivemobs.entity.ai.EntityAITrollagerAttacks;
-import net.daveyx0.primitivemobs.entity.item.EntityThrownBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -52,6 +51,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+
+import org.sporotofpoorety.eternitymode.entity.EntityThrownBlock;
+
 
 public class EntityTrollager extends EntityMob implements IAnimatedMob, IMultiMob {
 
@@ -517,6 +519,9 @@ public class EntityTrollager extends EntityMob implements IAnimatedMob, IMultiMo
         return flag;
     }
 
+
+
+
     /**
      * Attack the specified entity using a ranged attack.
      */
@@ -525,78 +530,83 @@ public class EntityTrollager extends EntityMob implements IAnimatedMob, IMultiMo
     {
 		switch (id)
 		{
-		case 0:
-		{
-	        EntityThrownBlock thownBlock = new EntityThrownBlock(this.getEntityWorld(), this.posX, this.posY, this.posZ, this, this.getThrownBlock());
-	        thownBlock.setLocationAndAngles(this.posX, this.posY + 4D, this.posZ, this.rotationYaw, 0.0F);
-	        thownBlock.motionX = (target.posX - thownBlock.posX) / 18D;
-	        thownBlock.motionY = (target.posY - thownBlock.posY) / 18D + 0.5D;
-	        thownBlock.motionZ = (target.posZ - this.posZ) / 18D;
-	        this.getEntityWorld().spawnEntity(thownBlock);
-	        this.playSound(PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
-	        break;
-		}
-		case 1:
-		{
-//Explosion goes where user is facing
-			double distanceX = (this.getLookHelper().getLookPosX() - this.posX);
-			double distanceZ = (this.getLookHelper().getLookPosZ() - this.posZ);
-		    double length = Math.sqrt((distanceX*distanceX) +(distanceZ*distanceZ) );
-		    if (length != 0) 
-            {
-		    	distanceX = distanceX/length;
-		    	distanceZ = distanceZ/length;
+		    case 0:
+		    {
+	            EntityThrownBlock thownBlock = new EntityThrownBlock(this.world, this, this.getThrownBlock(), this.posX, this.posY, this.posZ, 10.0F);
+	            thownBlock.setLocationAndAngles(this.posX, this.posY + 4D, this.posZ, this.rotationYaw, 0.0F);
+                thownBlock.setMovement((target.posX - thownBlock.posX) / 18D, (target.posY - thownBlock.posY) / 18D + 0.5D, (target.posZ - thownBlock.posZ) / 18D, 
+                0.04D, false, 0.98D);
+
+
+	            this.getEntityWorld().spawnEntity(thownBlock);
+	            this.playSound(PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
+	            break;
 		    }
 
+
+		    case 1:
+		    {
+//Explosion goes where user is facing
+			    double distanceX = (this.getLookHelper().getLookPosX() - this.posX);
+			    double distanceZ = (this.getLookHelper().getLookPosZ() - this.posZ);
+		        double length = Math.sqrt((distanceX*distanceX) +(distanceZ*distanceZ) );
+		        if (length != 0) 
+                {
+		        	distanceX = distanceX/length;
+		        	distanceZ = distanceZ/length;
+		        }
+
 //Adjust to reach target more easily
-		    double addedHeight = 0D;
-		    if(target.posY > this.posY)
-		    {
-		    	addedHeight = 1D;
-		    }
-		    else if(target.posY < this.posY)
-		    {
-		    	addedHeight = -1.5D;
-		    }
-			double explosionX = this.posX + (distanceX * 2D);
-			double explosionZ = this.posZ + (distanceZ * 2D);
+		        double addedHeight = 0D;
+		        if(target.posY > this.posY)
+		        {
+		        	addedHeight = 1D;
+		        }
+		        else if(target.posY < this.posY)
+		        {
+		        	addedHeight = -1.5D;
+		        }
+			    double explosionX = this.posX + (distanceX * 2D);
+			    double explosionZ = this.posZ + (distanceZ * 2D);
 //Configure explosion power and adjust up to prevent digging down
-			double explosionY = this.explosionPowerDestructive > 3F ? this.posY + this.getEyeHeight() + addedHeight + 1.5F + (float) (this.explosionPowerDestructive * 0.6) : this.posY + this.getEyeHeight() + addedHeight + 1.5F;
-			boolean flag = true;
-			if(!this.getEntityWorld().getGameRules().getBoolean("mobGriefing") || !this.explosionDestructive)
-			{
-				flag = false;
-			}
+			    double explosionY = this.explosionPowerDestructive > 3F ? this.posY + this.getEyeHeight() + addedHeight + 1.5F + (float) (this.explosionPowerDestructive * 0.6) : this.posY + this.getEyeHeight() + addedHeight + 1.5F;
+			    boolean flag = true;
+			    if(!this.getEntityWorld().getGameRules().getBoolean("mobGriefing") || !this.explosionDestructive)
+			    {
+				    flag = false;
+			    }
 //By calling on world should hopefully sync with client now
-			this.world.newExplosion(this, explosionX, explosionY, explosionZ, (float) this.explosionPowerDestructive, false, flag);
-            if(this.explosionPowerNondestructive > 0)
-            {
-                this.world.newExplosion(this, explosionX, explosionY, explosionZ, (float) this.explosionPowerNondestructive, false, false);
-            }
+			    this.world.newExplosion(this, explosionX, explosionY, explosionZ, (float) this.explosionPowerDestructive, false, flag);
+                if(this.explosionPowerNondestructive > 0)
+                {
+                    this.world.newExplosion(this, explosionX, explosionY, explosionZ, (float) this.explosionPowerNondestructive, false, false);
+                }
 			
 			//MMMessageRegistry.getNetwork().sendToAll(new MessageMMParticle(EnumParticleTypes.BLOCK_CRACK.getParticleID(), 50, (float)explosionX, (float)explosionY, (float)explosionZ, 0D,0D,0D, blockId));
 
 //Removing the multimob particles
 //			MMMessageRegistry.getNetwork().sendToAll(new MessageMMParticle(EnumParticleTypes.EXPLOSION_LARGE.getParticleID(), (10 * (int) Math.floor((PrimitiveMobsConfigSpecial.getTrollDestructionPower() / 3F))), (float)explosionX, (float)explosionY, (float)explosionZ, 1D,0D,0D, 0));
-			this.playSound(PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
-			break;
-		}
-		case 2:
-		{
-			if(this.getAttackTarget() != null && !this.isStone())
-			{
-				double d0 = this.getAttackReachSqr(this.getAttackTarget()) + 4;
-				double d1 = this.getDistanceSq(getAttackTarget().posX, getAttackTarget().getEntityBoundingBox().minY, getAttackTarget().posZ);
-				boolean flag = this.getEntitySenses().canSee(this.getAttackTarget());
-				
-	        	if (d1 <= d0 && flag)
-	        	{
-	        		this.attackEntityAsMob(this.getAttackTarget());
-	        	}
-	        	this.playSound(PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
-			}
-		}
-		default: break;
+			    this.playSound(PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
+			    break;
+		    }
+
+
+		    case 2:
+		    {
+			    if(this.getAttackTarget() != null && !this.isStone())
+			    {
+				    double d0 = this.getAttackReachSqr(this.getAttackTarget()) + 4;
+				    double d1 = this.getDistanceSq(getAttackTarget().posX, getAttackTarget().getEntityBoundingBox().minY, getAttackTarget().posZ);
+				    boolean flag = this.getEntitySenses().canSee(this.getAttackTarget());
+				    
+	            	if (d1 <= d0 && flag)
+	            	{
+	            		this.attackEntityAsMob(this.getAttackTarget());
+	            	}
+	            	this.playSound(PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
+			    }
+		    }
+		    default: break;
 		}
     }
 
