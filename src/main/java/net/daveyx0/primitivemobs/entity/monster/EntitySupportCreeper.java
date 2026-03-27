@@ -7,16 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import net.daveyx0.multimob.common.capabilities.CapabilityTameableEntity;
-import net.daveyx0.multimob.common.capabilities.ITameableEntity;
-import net.daveyx0.multimob.util.EntityUtil;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
-import net.daveyx0.primitivemobs.core.EntitiesWithinChunks;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.core.TaskUtils;
-import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -50,9 +40,20 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
+import net.daveyx0.multimob.common.capabilities.CapabilityTameableEntity;
+import net.daveyx0.multimob.common.capabilities.ITameableEntity;
+import net.daveyx0.multimob.util.EntityUtil;
 
 import org.sporotofpoorety.eternitymode.client.particles.ParticleSpiral; 
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
 import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityLiving;
+
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
+import net.daveyx0.primitivemobs.core.EntitiesWithinChunks;
+import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
+import net.daveyx0.primitivemobs.core.TaskUtils;
+import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 
 
 
@@ -305,7 +306,7 @@ public class EntitySupportCreeper extends EntityPrimitiveCreeper {
 //After executing play sound
                     this.world.playSound(null, 
                     supportCreeperAttackTarget.posX, supportCreeperAttackTarget.posY, supportCreeperAttackTarget.posZ,
-                    PrimitiveMobsSoundEvents.ENTITY_CREEPER_BUFF_EXECUTE, SoundCategory.NEUTRAL, 5.0F, 1.0F);
+                    EternityModeSoundEvents.ENTITY_CREEPER_BUFF_EXECUTE, SoundCategory.NEUTRAL, 5.0F, 1.0F);
 
 
 //After executing reset special and apply cooldown
@@ -577,7 +578,7 @@ public class EntitySupportCreeper extends EntityPrimitiveCreeper {
 
         this.world.playSound(null, 
         supportCreeperAttackTarget.posX, supportCreeperAttackTarget.posY, supportCreeperAttackTarget.posZ,
-        PrimitiveMobsSoundEvents.ENTITY_CREEPER_BUFF_ATTEMPT, SoundCategory.NEUTRAL, 5.0F, 1.0F);
+        EternityModeSoundEvents.ENTITY_CREEPER_BUFF_ATTEMPT, SoundCategory.NEUTRAL, 5.0F, 1.0F);
     }
 
     public void creeperSpecialParticles()

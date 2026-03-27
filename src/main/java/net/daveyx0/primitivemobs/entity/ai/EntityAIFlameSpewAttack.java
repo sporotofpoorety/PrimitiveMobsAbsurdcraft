@@ -35,8 +35,8 @@ import net.minecraft.world.World;
 
 //1 means preparing, above means shooting
         private int attackStep;
-//Linear general timer
-        private int nextActionCountdown;
+//Saw target while preattack
+        private boolean hasSeenTargetYet;
 
 
 //Total time spent preattack and preparing before attacking
@@ -47,10 +47,6 @@ import net.minecraft.world.World;
         private int shotParticles;
 //When in preattack phase, not on fire, and grant invulnerability
         private int goInvulnerableWhen;
-//Is either preparing or already shooting
-        private boolean readyToShoot;
-//Saw target while preattack
-        private boolean hasSeenTargetYet;
 //When in preattack phase sets on fire and go vulnerable
         protected int goVulnerableWhen;
 
@@ -87,13 +83,16 @@ import net.minecraft.world.World;
 
         public void startExecuting()
         {
-            this.visualState = 0;
+//Delay until next attack
+            this.spewer.nextActionCountdown = this.preAttackCountdownMax;
 //The max attackStep actually represents the attack being FINISHED
             this.attackStep = this.attackRapidfireShots;
-//Delay until next attack
-            this.nextActionCountdown = this.preAttackCountdownMax;
-            readyToShoot = false;
+
+            this.spewer.setReadyToShoot(false);
+
             hasSeenTargetYet = false;
+
+            this.visualState = 0;
         }
         
         /**
@@ -110,13 +109,15 @@ import net.minecraft.world.World;
         public void resetTask()
         {
             this.spewer.setOnFire(false);
-            this.visualState = 0;
+            this.spewer.nextActionCountdown = this.preAttackCountdownMax;
             this.attackStep = this.attackRapidfireShots;
-            this.nextActionCountdown = this.preAttackCountdownMax;
-            spewer.setNextActionCountdown(attackStep);
-            spewer.setVisualState(visualState);
+
+            this.spewer.setReadyToShoot(false);
+
             this.spewer.setInDanger(false);
-            readyToShoot = false;
+            this.visualState = 0;
+            spewer.setVisualState(visualState);
+            spewer.setActionCountUp(attackStep);
         }
 
         /**
@@ -125,19 +126,25 @@ import net.minecraft.world.World;
         public void updateTask()
         {
 //Decrements attack delay
-            --this.nextActionCountdown;
+            --this.spewer.nextActionCountdown;
             EntityLivingBase target = this.spewer.getAttackTarget();
 
+
+
+
 //Inbetween-attack preparation and animation logic
-            if(!this.readyToShoot && this.spewer.isInLava() && this.spewer.canEntityBeSeen(target))
+            if(!this.spewer.isReadyToShoot() && this.spewer.isInLava() && this.spewer.canEntityBeSeen(target))
             {
+
 //Will still be on fire from a previous attack here
-            	if(nextActionCountdown <= this.goInvulnerableWhen)
+            	if(this.spewer.nextActionCountdown <= this.goInvulnerableWhen)
             	{
 //Cancel prior on fire
             		this.spewer.setOnFire(false);
             		this.hasSeenTargetYet = false;
             	}
+
+
 //And then
                 if(!spewer.isOnFire())
                 {
@@ -146,33 +153,29 @@ import net.minecraft.world.World;
 //Set necessary flag for attack
                     	this.hasSeenTargetYet = true;
                     }
+
+
 //When not performing attack yet use attackStep for animation
-                    this.attackStep = (this.nextActionCountdown * (20 / this.preAttackCountdownMax));
+                    this.attackStep = (this.spewer.nextActionCountdown * (20 / this.preAttackCountdownMax));
 
 //When attack time is very near does something related to animation
-                    if(nextActionCountdown <= 3)
+                    if(this.spewer.nextActionCountdown <= 3)
                     {
                         this.visualState += 0.05f;
                     }
                 }
             }
 
-            double d0 = this.spewer.getDistanceSq(target);
 
-//If target is close and spewer is not in lava
-            if (d0 < 5.0D && !this.spewer.isInLava())
-            {
-//In danger
-            	this.spewer.setInDanger(true);
-/*
-//Melee attack every 20 ticks
-                if (this.nextActionCountdown <= 0)
-                {
-                    this.nextActionCountdown = 20;
-                    this.spewer.attackEntityAsMob(target);
-                }
-*/
-            }
+
+
+//Get target distance
+            double d0 = this.spewer.getDistanceSq(target);
+//If target is close and spewer is not in lava, in danger
+            if (d0 < 5.0D && !this.spewer.isInLava()) { this.spewer.setInDanger(true); }
+
+
+
 
 //Attack logic is here
             else if (d0 < (this.getFollowDistance() * this.getFollowDistance())  && this.spewer.isInLava())
@@ -182,36 +185,42 @@ import net.minecraft.world.World;
                 double d2 = target.getEntityBoundingBox().minY + (double)(target.height / 2.0F + 0.25f) - (this.spewer.posY + (double)(this.spewer.height / 2.0F));
                 double d3 = target.posZ - this.spewer.posZ;
 
+
+
+
 //Attack only executes after nextActionCountdown reaches 0
-                if (this.nextActionCountdown <= 0)
+                if (this.spewer.nextActionCountdown <= 0)
                 {
-//attackStep of 1 represents pre-attack
+//attackStep of 1 represents preparation
                     ++this.attackStep;
                     visualState -= 0.05f;
 
-//Pre-attack, some ticks between setting on fire and actually attacking
+//Preparation, some ticks between setting on fire and actually attacking
                     if (this.attackStep == 1)
                     {
-                        this.nextActionCountdown = this.goVulnerableWhen;
+                        this.spewer.nextActionCountdown = this.goVulnerableWhen;
                         this.spewer.setOnFire(true);
-                        readyToShoot = true;
+                        this.spewer.setReadyToShoot(true);
                     }
 //Main shot delay logic
                     else if (this.attackStep <= this.attackRapidfireShots)
                     {
-                        this.nextActionCountdown = this.attackRapidfireInterval;
+                        this.spewer.nextActionCountdown = this.attackRapidfireInterval;
                         this.spewer.setOnFire(true);
-                        readyToShoot = true;
+                        this.spewer.setReadyToShoot(true);
                     }
 //If max shots performed
                     else
                     {
-                        this.nextActionCountdown = this.preAttackCountdownMax;
+                        this.spewer.nextActionCountdown = this.preAttackCountdownMax;
                         this.attackStep = this.attackRapidfireShots;
 //This is the ACTUAL state reset and takes it back to inbetween-attack logic
-                        readyToShoot = false;
+                        this.spewer.setReadyToShoot(false);
                     }
 
+
+
+//Past first attackStep, each one shoots
                     if (this.attackStep > 1 && hasSeenTargetYet)
                     {
                         float f = MathHelper.sqrt(MathHelper.sqrt(d0) * 0.1F);
@@ -226,8 +235,12 @@ import net.minecraft.world.World;
                     }
                 }
             }
+
+
+
+
 //If not in range can approach target's position
-            else if(this.spewer.isInLava()  && this.spewer.canEntityBeSeen(target) && !this.readyToShoot)
+            else if(this.spewer.isInLava()  && this.spewer.canEntityBeSeen(target) && !this.spewer.isReadyToShoot())
             {
                 double d1 = target.posX - this.spewer.posX;
                 double d3 = target.posZ - this.spewer.posZ;
@@ -238,7 +251,7 @@ import net.minecraft.world.World;
             }
             else
             {
-                if(!this.readyToShoot)
+                if(!this.spewer.isReadyToShoot())
                 {
                 	this.spewer.getNavigator().clearPath();
                 	this.spewer.setInDanger(false);
@@ -258,7 +271,7 @@ import net.minecraft.world.World;
             }
             
             spewer.setVisualState(visualState);
-            spewer.setNextActionCountdown(attackStep);
+            spewer.setActionCountUp(attackStep);
 
             super.updateTask();
         }

@@ -1,18 +1,10 @@
 package net.daveyx0.primitivemobs.entity.monster;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
-import net.daveyx0.multimob.entity.IMultiMob;
-import net.daveyx0.multimob.entity.ai.EntityAIBackOffFromEntity;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.core.TaskUtils;
-import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
-import net.daveyx0.primitivemobs.entity.item.EntityPrimitiveTNTPrimed;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -37,6 +29,19 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
+
+import net.daveyx0.multimob.entity.IMultiMob;
+import net.daveyx0.multimob.entity.ai.EntityAIBackOffFromEntity;
+
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+import org.sporotofpoorety.eternitymode.util.FireworkUtil;
+
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
+import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
+import net.daveyx0.primitivemobs.core.TaskUtils;
+import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
+import net.daveyx0.primitivemobs.entity.item.EntityPrimitiveTNTPrimed;
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 
 
 
@@ -112,7 +117,8 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
 
 
 //Constructor
-	public EntityFestiveCreeper(World worldIn) {
+	public EntityFestiveCreeper(World worldIn) 
+    {
 		super(worldIn);
 		isImmuneToFire = true;
 //Access getters and setters of EntityCreeper mixin
@@ -283,7 +289,7 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
                         specialCurrentRadians = specialInitialRadians;
 //Then play sound and start attack
                         this.world.playSound(null, festiveCreeperAttackTarget.posX, festiveCreeperAttackTarget.posY, festiveCreeperAttackTarget.posZ,
-                        PrimitiveMobsSoundEvents.ENTITY_CREEPER_PARTY, SoundCategory.NEUTRAL, 3.0F, 1.0F);
+                        EternityModeSoundEvents.ENTITY_CREEPER_PARTY, SoundCategory.HOSTILE, 3.0F, 1.0F);
                         this.setCreeperPartying(true);
                     }
                 }
@@ -351,15 +357,34 @@ public class EntityFestiveCreeper extends EntityPrimitiveCreeper implements IMul
     public void creeperSpecialAttemptSound(double atX, double atY, double atZ)
     {
         this.world.playSound(null, atX, atY, atZ,
-        PrimitiveMobsSoundEvents.ENTITY_CREEPER_ITEMBOX, SoundCategory.NEUTRAL, 3.0F, 1.0F);
+        EternityModeSoundEvents.ENTITY_CREEPER_ITEMBOX, SoundCategory.HOSTILE, 3.0F, 1.0F);
     }
 
     public void creeperSpecialParticles()
     {
-        if(this.world.isRemote)
+//If attack preparing
+        if(!this.getCreeperPartying())
         {
-            this.world.spawnParticle(EnumParticleTypes.FLAME, this.posX, this.posY + (this.height / 2.0F), this.posZ, 
-            this.getRNG().nextGaussian(), this.getRNG().nextGaussian(), this.getRNG().nextGaussian());
+//Infrequent spherical fireworks
+            if(this.ticksExisted % 15 == 0)
+            {
+                FireworkUtil.makeFireworkEffects(this.world, this.posX, this.posY + 8.0D, this.posZ,
+                    0.0D, 0.5D, 0.0D,
+                    1, 
+                    true, true, 1);
+            }
+        }
+//If attack executing
+        else
+        {
+//Frequent creeper or star fireworks
+            if(this.ticksExisted % 15 == 0)
+            {
+                FireworkUtil.makeFireworkEffects(this.world, this.posX, this.posY + 8.0D, this.posZ,
+                    0.0D, 0.5D, 0.0D,
+                    1, 
+                    true, true, 2 + this.rand.nextInt(2));
+            }
         }
     }
 

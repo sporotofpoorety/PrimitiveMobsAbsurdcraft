@@ -2,14 +2,8 @@ package net.daveyx0.primitivemobs.entity.monster;
 
 import javax.annotation.Nullable;
 
-import net.daveyx0.multimob.entity.IMultiMob;
-import net.daveyx0.multimob.entity.IMultiMobLava;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.core.TaskUtils;
-import net.daveyx0.primitivemobs.entity.ai.EntityAIFlameSpewAttack;
-import net.daveyx0.primitivemobs.entity.item.EntityFlameSpit;
+
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
@@ -44,12 +38,29 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 
-public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IMultiMobLava {
+import net.daveyx0.multimob.entity.IMultiMob;
+import net.daveyx0.multimob.entity.IMultiMobLava;
+
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
+import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
+import net.daveyx0.primitivemobs.core.TaskUtils;
+import net.daveyx0.primitivemobs.entity.ai.EntityAIFlameSpewAttack;
+import net.daveyx0.primitivemobs.entity.item.EntityFlameSpit;
+
+
+
+
+public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IMultiMobLava 
+{
 
     private static final DataParameter<Byte> ON_FIRE = EntityDataManager.<Byte>createKey(EntityFlameSpewer.class, DataSerializers.BYTE);
     private static final DataParameter<Byte> IN_DANGER = EntityDataManager.<Byte>createKey(EntityFlameSpewer.class, DataSerializers.BYTE);
-    private static final DataParameter<Integer> NEXT_COUNTDOWN = EntityDataManager.<Integer>createKey(EntityFlameSpewer.class, DataSerializers.VARINT);
+    private static final DataParameter<Integer> COUNT_UP = EntityDataManager.<Integer>createKey(EntityFlameSpewer.class, DataSerializers.VARINT);
     private static final DataParameter<Float> VISUAL_STATE = EntityDataManager.<Float>createKey(EntityFlameSpewer.class, DataSerializers.FLOAT);
+    private static final DataParameter<Byte> READY_TO_SHOOT = EntityDataManager.<Byte>createKey(EntityFlameSpewer.class, DataSerializers.BYTE);
+
 
     private int preAttackCountdownMax;
     protected int shotLifetime;
@@ -60,15 +71,21 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
     protected int attackRapidfireInterval;
     protected double attackRapidfireSpread;
 
+
+//Linear general timer
+    public int nextActionCountdown;
+
     
-	public EntityFlameSpewer(World worldIn) {
+	public EntityFlameSpewer(World worldIn) 
+    {
 		super(worldIn);
 
 		this.isImmuneToFire = true;
 		this.setOnFire(false);
 		this.setInDanger(false);
-		this.setNextActionCountdown(10);
+		this.setActionCountUp(10);
 		this.setVisualState(0);
+        this.setReadyToShoot(false);
 		this.setSize(1f, 1.25f);
 		this.setPathPriority(PathNodeType.LAVA, 10);
 
@@ -81,9 +98,56 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
         this.attackRapidfireInterval = PrimitiveMobsConfigSpecial.getFlameSpewerAttackRapidfireInterval();
         this.attackRapidfireSpread = PrimitiveMobsConfigSpecial.getFlameSpewerAttackRapidfireSpread();
 
+        this.nextActionCountdown = this.preAttackCountdownMax;
+
 		this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.preAttackCountdownMax, this.shotLifetime, this.shotParticles,
         this.goInvulnerableWhen, this.goVulnerableWhen, this.attackRapidfireShots, this.attackRapidfireInterval, this.attackRapidfireSpread));
 	}
+
+
+    public void writeEntityToNBT(NBTTagCompound compound)
+    {
+        super.writeEntityToNBT(compound);
+
+        compound.setInteger("ActionCountUp", this.getActionCountUp());
+        compound.setFloat("VisualState", this.getVisualState());
+        compound.setBoolean("OnFire", this.isOnFire());
+        compound.setBoolean("InDanger", this.isInDanger());
+        compound.setBoolean("ReadyToShoot", this.isReadyToShoot());
+
+//Preserves field values including assigned by NBT
+        compound.setInteger("PreAttackCountdownMax", preAttackCountdownMax);
+        compound.setInteger("ShotLifetime", shotLifetime);
+        compound.setInteger("ShotParticles", shotParticles);
+        compound.setInteger("GoInvulnerableWhen", goInvulnerableWhen);
+        compound.setInteger("GoVulnerableWhen", goVulnerableWhen);
+        compound.setInteger("AttackRapidfireShots", attackRapidfireShots);
+        compound.setInteger("AttackRapidfireInterval", attackRapidfireInterval);
+        compound.setDouble("AttackRapidfireSpread", attackRapidfireSpread);
+
+        compound.setInteger("NextActionCountdown", nextActionCountdown);
+    }
+
+
+    protected void applyEntityAttributes()
+    {
+        super.applyEntityAttributes();
+        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.23000000417232513D);
+        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(48.0D);
+    }
+
+
+    protected void entityInit()
+    {
+        super.entityInit();
+        this.dataManager.register(ON_FIRE, Byte.valueOf((byte)0));
+        this.dataManager.register(IN_DANGER, Byte.valueOf((byte)0));
+        this.getDataManager().register(COUNT_UP, Integer.valueOf(0));
+        this.getDataManager().register(VISUAL_STATE, Float.valueOf(0));
+        this.dataManager.register(READY_TO_SHOOT, Byte.valueOf((byte)0));
+    }
+
 
 	protected void initEntityAI()
     {
@@ -95,35 +159,52 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
         this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
     }
 
-    @Override 
-    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata)
-    {
-        super.onInitialSpawn(difficulty, livingdata);
 
-        return livingdata;
+
+    public void readEntityFromNBT(NBTTagCompound compound)
+    {
+        super.readEntityFromNBT(compound);
+
+        this.setActionCountUp(compound.getInteger("ActionCountUp"));
+        this.setVisualState(compound.getFloat("VisualState"));
+        this.setOnFire(compound.getBoolean("OnFire"));
+        this.setInDanger(compound.getBoolean("InDanger"));
+        this.setReadyToShoot(compound.getBoolean("ReadyToShoot"));
+
+//Avoids overwriting the fields with empty NBT tag values on initial spawn
+        if (compound.hasKey("PreAttackCountdownMax")) { this.preAttackCountdownMax = compound.getInteger("PreAttackCountdownMax"); }
+        if (compound.hasKey("ShotLifetime")) { this.shotLifetime = compound.getInteger("ShotLifetime"); }
+        if (compound.hasKey("ShotParticles")) { this.shotParticles = compound.getInteger("ShotParticles"); }
+        if (compound.hasKey("GoInvulnerableWhen")) { this.goInvulnerableWhen = compound.getInteger("GoInvulnerableWhen"); }
+        if (compound.hasKey("GoVulnerableWhen")) { this.goVulnerableWhen = compound.getInteger("GoVulnerableWhen"); }
+        if (compound.hasKey("AttackRapidfireShots")) { this.attackRapidfireShots = compound.getInteger("AttackRapidfireShots"); }
+        if (compound.hasKey("AttackRapidfireInterval")) { this.attackRapidfireInterval = compound.getInteger("AttackRapidfireInterval"); }
+        if (compound.hasKey("AttackRapidfireSpread")) { this.attackRapidfireSpread = compound.getDouble("AttackRapidfireSpread"); }
+
+        if (compound.hasKey("NextActionCountdown")) { this.nextActionCountdown = compound.getInteger("NextActionCountdown"); }
+
+//Add task if absent
+        if(!TaskUtils.mobHasTask(this, EntityAIFlameSpewAttack.class))
+        {
+		    this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.preAttackCountdownMax, this.shotLifetime, this.shotParticles,
+            this.goInvulnerableWhen, this.goVulnerableWhen, this.attackRapidfireShots, this.attackRapidfireInterval, this.attackRapidfireSpread));
+        }
+//If task is here remove then reassign based on NBT (can be used to overwrite configs and make custom variants)
+        else
+        {
+            TaskUtils.mobRemoveTaskIfPresent(this, EntityAIFlameSpewAttack.class);
+
+		    this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.preAttackCountdownMax, this.shotLifetime, this.shotParticles,
+            this.goInvulnerableWhen, this.goVulnerableWhen, this.attackRapidfireShots, this.attackRapidfireInterval, this.attackRapidfireSpread));       
+        }
+
     }
 
-	
-    protected void applyEntityAttributes()
-    {
-        super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.23000000417232513D);
-        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(48.0D);
-    }
 
-    protected void entityInit()
-    {
-        super.entityInit();
-        this.dataManager.register(ON_FIRE, Byte.valueOf((byte)0));
-        this.dataManager.register(IN_DANGER, Byte.valueOf((byte)0));
-        this.getDataManager().register(NEXT_COUNTDOWN, Integer.valueOf(0));
-        this.getDataManager().register(VISUAL_STATE, Float.valueOf(0));
-    }
     
     protected SoundEvent getAmbientSound()
     {
-        return PrimitiveMobsSoundEvents.ENTITY_FLAMESPEWER_IDLE;
+        return EternityModeSoundEvents.ENTITY_FLAMESPEWER_IDLE;
     }
     
     protected SoundEvent getHurtSound(DamageSource damageSourceIn)
@@ -135,20 +216,44 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
     {
         return SoundEvents.ENTITY_SQUID_DEATH;
     }
+
+
+
+
+
+//Trying to remove buggy iframes
+    @Override
+    public void setFire(int seconds)
+    {
+
+    }
+
+//Trying to remove buggy iframes
+    @Override
+    public boolean attackEntityFrom(DamageSource source, float amount)
+    {
+        if (source == DamageSource.LAVA 
+        || source == DamageSource.IN_FIRE
+        || source.getTrueSource() == this)
+        {
+            return false;
+        }
+
+        return super.attackEntityFrom(source, amount);
+    }
     
     /**
      * Returns whether this Entity is invulnerable to the given DamageSource.
      */
     public boolean isEntityInvulnerable(DamageSource source)
     {
-//      return this.getNextActionCountdown() < 10 || this.getVisualState() > 0;
-        return !this.isOnFire();
+          return !this.isReadyToShoot();
     }
 
     
-    public void setNextActionCountdown(int time)
+    public void setActionCountUp(int time)
     {
-        this.getDataManager().set(NEXT_COUNTDOWN, Integer.valueOf(time));
+        this.getDataManager().set(COUNT_UP, Integer.valueOf(time));
     }
     
     public void setVisualState(float visualState)
@@ -156,9 +261,9 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
         this.getDataManager().set(VISUAL_STATE, Float.valueOf(visualState));
     }
     
-    public int getNextActionCountdown()
+    public int getActionCountUp()
     {
-        return ((Integer)this.getDataManager().get(NEXT_COUNTDOWN)).intValue();
+        return ((Integer)this.getDataManager().get(COUNT_UP)).intValue();
     }
     
     public float getVisualState()
@@ -196,7 +301,7 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
 	    	}
 	    }
 	    
-	    //MultiMob.LOGGER.info(this.getNextActionCountdown() + " " + this.getVisualState() + " " + this.isOnFire());
+	    //MultiMob.LOGGER.info(this.getActionCountUp() + " " + this.getVisualState() + " " + this.isOnFire());
 	}
 	
     /**
@@ -264,6 +369,12 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
         return (((Byte)this.dataManager.get(ON_FIRE)).byteValue() & 1) != 0;
     }
 
+    public boolean isReadyToShoot()
+    {
+        return (((Byte)this.dataManager.get(READY_TO_SHOOT)).byteValue() & 1) != 0;
+    }
+
+
     public void setOnFire(boolean onFire)
     {
         byte b0 = ((Byte)this.dataManager.get(ON_FIRE)).byteValue();
@@ -278,6 +389,23 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
         }
 
         this.dataManager.set(ON_FIRE, Byte.valueOf(b0));
+    }
+
+
+    public void setReadyToShoot(boolean readyToShoot)
+    {
+        byte b0 = ((Byte)this.dataManager.get(READY_TO_SHOOT)).byteValue();
+
+        if (readyToShoot)
+        {
+            b0 = (byte)(b0 | 1);
+        }
+        else
+        {
+            b0 = (byte)(b0 & -2);
+        }
+
+        this.dataManager.set(READY_TO_SHOOT, Byte.valueOf(b0));
     }
     
     public boolean isInDanger()
@@ -383,71 +511,5 @@ public class EntityFlameSpewer extends EntityMob implements IRangedAttackMob, IM
     {
     	if(type == EnumCreatureType.MONSTER){return false;}
     	return super.isCreatureType(type, forSpawnCount);
-    }
-
-
-
-
-	  /**
-     * (abstract) Protected helper method to write subclass entity data to NBT.
-     */
-    public void writeEntityToNBT(NBTTagCompound compound)
-    {
-        super.writeEntityToNBT(compound);
-
-        compound.setInteger("NextActionCountdown", this.getNextActionCountdown());
-        compound.setFloat("VisualState", this.getVisualState());
-        compound.setBoolean("OnFire", this.isOnFire());
-        compound.setBoolean("InDanger", this.isInDanger());
-
-//Preserves field values including assigned by NBT
-        compound.setInteger("PreAttackCountdownMax", preAttackCountdownMax);
-        compound.setInteger("ShotLifetime", shotLifetime);
-        compound.setInteger("ShotParticles", shotParticles);
-        compound.setInteger("GoInvulnerableWhen", goInvulnerableWhen);
-        compound.setInteger("GoVulnerableWhen", goVulnerableWhen);
-        compound.setInteger("AttackRapidfireShots", attackRapidfireShots);
-        compound.setInteger("AttackRapidfireInterval", attackRapidfireInterval);
-        compound.setDouble("AttackRapidfireSpread", attackRapidfireSpread);
-    }
-
-
-    /**
-     * (abstract) Protected helper method to read subclass entity data from NBT.
-     */
-    public void readEntityFromNBT(NBTTagCompound compound)
-    {
-        super.readEntityFromNBT(compound);
-
-        this.setNextActionCountdown(compound.getInteger("NextActionCountdown"));
-        this.setVisualState(compound.getFloat("VisualState"));
-        this.setOnFire(compound.getBoolean("OnFire"));
-        this.setInDanger(compound.getBoolean("InDanger"));
-
-//Avoids overwriting the fields with empty NBT tag values on initial spawn
-        if (compound.hasKey("PreAttackCountdownMax")) { this.preAttackCountdownMax = compound.getInteger("PreAttackCountdownMax"); }
-        if (compound.hasKey("ShotLifetime")) { this.shotLifetime = compound.getInteger("ShotLifetime"); }
-        if (compound.hasKey("ShotParticles")) { this.shotParticles = compound.getInteger("ShotParticles"); }
-        if (compound.hasKey("GoInvulnerableWhen")) { this.goInvulnerableWhen = compound.getInteger("GoInvulnerableWhen"); }
-        if (compound.hasKey("GoVulnerableWhen")) { this.goVulnerableWhen = compound.getInteger("GoVulnerableWhen"); }
-        if (compound.hasKey("AttackRapidfireShots")) { this.attackRapidfireShots = compound.getInteger("AttackRapidfireShots"); }
-        if (compound.hasKey("AttackRapidfireInterval")) { this.attackRapidfireInterval = compound.getInteger("AttackRapidfireInterval"); }
-        if (compound.hasKey("AttackRapidfireSpread")) { this.attackRapidfireSpread = compound.getDouble("AttackRapidfireSpread"); }
-
-//Add task if absent
-        if(!TaskUtils.mobHasTask(this, EntityAIFlameSpewAttack.class))
-        {
-		    this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.preAttackCountdownMax, this.shotLifetime, this.shotParticles,
-            this.goInvulnerableWhen, this.goVulnerableWhen, this.attackRapidfireShots, this.attackRapidfireInterval, this.attackRapidfireSpread));
-        }
-//If task is here remove then reassign based on NBT (can be used to overwrite configs and make custom variants)
-        else
-        {
-            TaskUtils.mobRemoveTaskIfPresent(this, EntityAIFlameSpewAttack.class);
-
-		    this.tasks.addTask(4, new EntityAIFlameSpewAttack(this, this.preAttackCountdownMax, this.shotLifetime, this.shotParticles,
-            this.goInvulnerableWhen, this.goVulnerableWhen, this.attackRapidfireShots, this.attackRapidfireInterval, this.attackRapidfireSpread));       
-        }
-
     }
 }

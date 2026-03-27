@@ -7,24 +7,6 @@ import javax.annotation.Nullable;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
-import net.daveyx0.multimob.core.MultiMob;
-import net.daveyx0.multimob.entity.IMultiMob;
-import net.daveyx0.multimob.entity.IMultiMobPassive;
-import net.daveyx0.multimob.entity.ai.EntityAITemptItemStack;
-import net.daveyx0.multimob.message.MMMessageRegistry;
-import net.daveyx0.multimob.message.MessageMMParticle;
-import net.daveyx0.multimob.modint.DynamicTreesIntegration;
-import net.daveyx0.multimob.util.ColorUtil;
-import net.daveyx0.multimob.util.EntityUtil;
-import net.daveyx0.multimob.util.NBTUtil;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
-import net.daveyx0.primitivemobs.core.PrimitiveMobs;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsItems;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.entity.ai.EntityAIGroveSpriteTempt;
-import net.daveyx0.primitivemobs.item.ItemGroveSpriteSap;
-import net.daveyx0.primitivemobs.message.MessagePrimitiveColorSap;
-import net.daveyx0.primitivemobs.modint.PrimitiveMobsDTIntegration;
 import net.minecraft.block.Block;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.state.IBlockState;
@@ -68,8 +50,33 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
+
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import net.daveyx0.multimob.core.MultiMob;
+import net.daveyx0.multimob.entity.IMultiMob;
+import net.daveyx0.multimob.entity.IMultiMobPassive;
+import net.daveyx0.multimob.entity.ai.EntityAITemptItemStack;
+import net.daveyx0.multimob.message.MMMessageRegistry;
+import net.daveyx0.multimob.message.MessageMMParticle;
+import net.daveyx0.multimob.modint.DynamicTreesIntegration;
+import net.daveyx0.multimob.util.ColorUtil;
+import net.daveyx0.multimob.util.EntityUtil;
+import net.daveyx0.multimob.util.NBTUtil;
+
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
+import net.daveyx0.primitivemobs.core.PrimitiveMobs;
+import net.daveyx0.primitivemobs.core.PrimitiveMobsItems;
+import net.daveyx0.primitivemobs.entity.ai.EntityAIGroveSpriteTempt;
+import net.daveyx0.primitivemobs.item.ItemGroveSpriteSap;
+import net.daveyx0.primitivemobs.message.MessagePrimitiveColorSap;
+import net.daveyx0.primitivemobs.modint.PrimitiveMobsDTIntegration;
+
+
+
 
 public class EntityGroveSprite extends EntityCreature implements IMultiMobPassive
 {
@@ -382,7 +389,7 @@ public class EntityGroveSprite extends EntityCreature implements IMultiMobPassiv
             {
             	world.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, posX + (rand.nextFloat() - rand.nextFloat()), posY + rand.nextFloat() + 1D, posZ + (rand.nextFloat() - rand.nextFloat()), 0, 0, 0);
             }
-            this.playSound(PrimitiveMobsSoundEvents.ENTITY_GROVESPRITE_THANKS, 1, 1);
+            this.playSound(EternityModeSoundEvents.ENTITY_GROVESPRITE_THANKS, 1, 1);
             return true;
         }
         else if(itemstack.getItem() == Items.WHEAT_SEEDS)
@@ -392,7 +399,7 @@ public class EntityGroveSprite extends EntityCreature implements IMultiMobPassiv
             {
             	world.spawnParticle(EnumParticleTypes.HEART, posX + (rand.nextFloat() - rand.nextFloat()), posY + rand.nextFloat() + 1D, posZ + (rand.nextFloat() - rand.nextFloat()), 0, 0, 0);
             }
-            this.playSound(PrimitiveMobsSoundEvents.ENTITY_GROVESPRITE_THANKS, 1, 1);
+            this.playSound(EternityModeSoundEvents.ENTITY_GROVESPRITE_THANKS, 1, 1);
         	this.setHealth(this.getMaxHealth());
         	return true;
         }
@@ -406,7 +413,7 @@ public class EntityGroveSprite extends EntityCreature implements IMultiMobPassiv
                 	world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, posX + (rand.nextFloat() - rand.nextFloat()), posY + rand.nextFloat() + 1D, posZ + (rand.nextFloat() - rand.nextFloat()), 0, 0, 0);
                 }
                 this.setSaplingAmount(this.getSaplingAmount() - 1);
-                this.playSound(PrimitiveMobsSoundEvents.ENTITY_GROVESPRITE_THANKS, 1, 1);
+                this.playSound(EternityModeSoundEvents.ENTITY_GROVESPRITE_THANKS, 1, 1);
                 if(!this.world.isRemote)
                 {
                 	ItemStack sap = this.getHeldItemOffhand().copy();
@@ -572,7 +579,7 @@ public class EntityGroveSprite extends EntityCreature implements IMultiMobPassiv
 
     protected SoundEvent getAmbientSound()
     {
-        return PrimitiveMobsSoundEvents.ENTITY_GROVESPRITE_IDLE;
+        return EternityModeSoundEvents.ENTITY_GROVESPRITE_IDLE;
     }
     
     public void setIsBegging(boolean begging)

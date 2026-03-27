@@ -5,17 +5,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import net.daveyx0.multimob.core.MultiMob;
-import net.daveyx0.multimob.entity.EntityMMFlyingCreature;
-import net.daveyx0.multimob.entity.IMultiMob;
-import net.daveyx0.multimob.entity.ai.EntityAIFlyingAround;
-import net.daveyx0.multimob.entity.ai.EntityAISenseEntityNearestPlayer;
-import net.daveyx0.multimob.message.MMMessageRegistry;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.core.TaskUtils;
-import net.daveyx0.primitivemobs.message.MessageTeleportEye;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
@@ -42,6 +31,23 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.entity.boss.EntityDragon;
+
+import net.daveyx0.multimob.core.MultiMob;
+import net.daveyx0.multimob.entity.EntityMMFlyingCreature;
+import net.daveyx0.multimob.entity.IMultiMob;
+import net.daveyx0.multimob.entity.ai.EntityAIFlyingAround;
+import net.daveyx0.multimob.entity.ai.EntityAISenseEntityNearestPlayer;
+import net.daveyx0.multimob.message.MMMessageRegistry;
+
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
+import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
+import net.daveyx0.primitivemobs.core.TaskUtils;
+import net.daveyx0.primitivemobs.message.MessageTeleportEye;
+
+
+
 
 public class EntityVoidEye extends EntityMMFlyingCreature implements IMultiMob {
 
@@ -476,7 +482,7 @@ public class EntityVoidEye extends EntityMMFlyingCreature implements IMultiMob {
     @Nullable
     public SoundEvent getAmbientSound()
     {
-        return PrimitiveMobsSoundEvents.ENTITY_VOIDEYE_IDLE;
+        return EternityModeSoundEvents.ENTITY_VOIDEYE_IDLE;
     }
     
     protected SoundEvent getHurtSound(DamageSource p_184601_1_)

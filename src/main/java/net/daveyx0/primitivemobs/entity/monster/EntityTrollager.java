@@ -2,17 +2,6 @@ package net.daveyx0.primitivemobs.entity.monster;
 
 import javax.annotation.Nullable;
 
-import net.daveyx0.multimob.core.MultiMob;
-import net.daveyx0.multimob.entity.IMultiMob;
-import net.daveyx0.multimob.entity.ai.EntityAISenseEntityNearestPlayer;
-import net.daveyx0.multimob.message.MMMessageRegistry;
-import net.daveyx0.multimob.message.MessageMMParticle;
-import net.daveyx0.multimob.util.NBTUtil;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.core.TaskUtils;
-import net.daveyx0.primitivemobs.entity.IAnimatedMob;
-import net.daveyx0.primitivemobs.entity.ai.EntityAITrollagerAttacks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -52,7 +41,22 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
+import net.daveyx0.multimob.core.MultiMob;
+import net.daveyx0.multimob.entity.IMultiMob;
+import net.daveyx0.multimob.entity.ai.EntityAISenseEntityNearestPlayer;
+import net.daveyx0.multimob.message.MMMessageRegistry;
+import net.daveyx0.multimob.message.MessageMMParticle;
+import net.daveyx0.multimob.util.NBTUtil;
+
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
 import org.sporotofpoorety.eternitymode.entity.EntityThrownBlock;
+
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
+import net.daveyx0.primitivemobs.core.TaskUtils;
+import net.daveyx0.primitivemobs.entity.IAnimatedMob;
+import net.daveyx0.primitivemobs.entity.ai.EntityAITrollagerAttacks;
+
+
 
 
 public class EntityTrollager extends EntityMob implements IAnimatedMob, IMultiMob {
@@ -472,19 +476,19 @@ public class EntityTrollager extends EntityMob implements IAnimatedMob, IMultiMo
     {
     	if(this.isStone())return null;
     	
-        return PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_IDLE;
+        return EternityModeSoundEvents.ENTITY_TROLLAGER_IDLE;
     }
 
     protected SoundEvent getHurtSound(DamageSource p_184601_1_)
     {
     	if(this.isStone())return SoundEvents.BLOCK_STONE_BREAK;
     	
-        return PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_HIT;
+        return EternityModeSoundEvents.ENTITY_TROLLAGER_HIT;
     }
 
     protected SoundEvent getDeathSound()
     {
-        return PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_DEATH;
+        return EternityModeSoundEvents.ENTITY_TROLLAGER_DEATH;
     }
     
     /**
@@ -532,14 +536,16 @@ public class EntityTrollager extends EntityMob implements IAnimatedMob, IMultiMo
 		{
 		    case 0:
 		    {
-	            EntityThrownBlock thownBlock = new EntityThrownBlock(this.world, this, this.getThrownBlock(), this.posX, this.posY, this.posZ, 10.0F);
-	            thownBlock.setLocationAndAngles(this.posX, this.posY + 4D, this.posZ, this.rotationYaw, 0.0F);
-                thownBlock.setMovement((target.posX - thownBlock.posX) / 18D, (target.posY - thownBlock.posY) / 18D + 0.5D, (target.posZ - thownBlock.posZ) / 18D, 
+                EntityThrownBlock thrownBlock = new EntityThrownBlock(this.world, this.posX, this.posY + 4.0D, this.posZ, 
+                    this, this.world.getBlockState(this.getThrownBlock()), 
+                    true, false, true, 10.0F);
+//	            thrownBlock.setLocationAndAngles(this.posX, this.posY + 4.0D, this.posZ, this.rotationYaw, 0.0F);
+                thrownBlock.setMovement((target.posX - thrownBlock.posX) / 18D, (target.posY - thrownBlock.posY) / 18D + 0.5D, (target.posZ - thrownBlock.posZ) / 18D, 
                 0.04D, false, 0.98D);
 
 
-	            this.getEntityWorld().spawnEntity(thownBlock);
-	            this.playSound(PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
+	            this.getEntityWorld().spawnEntity(thrownBlock);
+	            this.playSound(EternityModeSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
 	            break;
 		    }
 
@@ -586,7 +592,7 @@ public class EntityTrollager extends EntityMob implements IAnimatedMob, IMultiMo
 
 //Removing the multimob particles
 //			MMMessageRegistry.getNetwork().sendToAll(new MessageMMParticle(EnumParticleTypes.EXPLOSION_LARGE.getParticleID(), (10 * (int) Math.floor((PrimitiveMobsConfigSpecial.getTrollDestructionPower() / 3F))), (float)explosionX, (float)explosionY, (float)explosionZ, 1D,0D,0D, 0));
-			    this.playSound(PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
+			    this.playSound(EternityModeSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
 			    break;
 		    }
 
@@ -603,7 +609,7 @@ public class EntityTrollager extends EntityMob implements IAnimatedMob, IMultiMo
 	            	{
 	            		this.attackEntityAsMob(this.getAttackTarget());
 	            	}
-	            	this.playSound(PrimitiveMobsSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
+	            	this.playSound(EternityModeSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
 			    }
 		    }
 		    default: break;

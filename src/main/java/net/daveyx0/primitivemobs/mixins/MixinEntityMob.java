@@ -1,5 +1,6 @@
 package net.daveyx0.primitivemobs.mixins;
 
+
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,27 +13,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-
-import net.daveyx0.primitivemobs.entity.monster.EntityPrimitiveCreeper;
-import net.daveyx0.primitivemobs.entity.monster.EntityPrimitiveTameableMob;
-
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityMob;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
-
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-
 import net.minecraft.util.DamageSource;
-
 import net.minecraft.world.World;
 
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
 import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityLiving;
+
+import net.daveyx0.primitivemobs.entity.monster.EntityPrimitiveCreeper;
+import net.daveyx0.primitivemobs.entity.monster.EntityPrimitiveTameableMob;
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityMob;
 
 
 
@@ -133,7 +129,7 @@ public abstract class MixinEntityMob implements IMixinEntityMob
     @Inject
     (
         method = "attackEntityFrom",
-        at = @At("HEAD")
+        at = @At("TAIL")
     )
     private void attackEntitySpecialInterrupt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callInfo)
     {
@@ -152,18 +148,12 @@ public abstract class MixinEntityMob implements IMixinEntityMob
                     Entity selfEntity = (Entity) (Object) this;
                     EntityCreeper selfEntityCreeper = (EntityCreeper) (Object) this;
 //Play sound
-                    selfEntity.playSound(PrimitiveMobsSoundEvents.ENTITY_CREEPER_DIZZY, 3.0F, 1.0F);
+                    selfEntity.playSound(EternityModeSoundEvents.ENTITY_DIZZY, 3.0F, 1.0F);
 //Apply special cooldown
                     selfCreeperMixin.setCreeperSpecialCooldown(selfCreeperMixin.getCreeperSpecialCooldownStunned());
 //And apply stun
                     IMixinEntityLiving selfEntityLivingMixin = (IMixinEntityLiving) (Object) this;
-
                     selfEntityLivingMixin.setAbsurdcraftStunned(true);
-
-                    if(selfEntityLivingMixin.getAbsurdcraftStunned())
-                    {
-                        Entity living = (Entity) (Object) this;
-                    }
                     selfEntityLivingMixin.setAbsurdcraftStunnedTimer(selfCreeperMixin.getCreeperSpecialStunnedDuration());
                 }
 //If just attacked normally there's a smaller cooldown 

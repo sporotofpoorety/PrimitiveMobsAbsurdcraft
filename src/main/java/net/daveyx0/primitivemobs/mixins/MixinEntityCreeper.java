@@ -10,25 +10,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityCreeper;
-
 import net.minecraft.nbt.NBTTagCompound;
-
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundCategory;
-
 import net.minecraft.world.World;
 
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
 import org.sporotofpoorety.eternitymode.entity.ai.EntityAIStun;
+
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 
 
 
@@ -146,7 +142,7 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
 //Increase special ignited time
             creeperSpecialIgnitedTime++;
 //Do special particle
-            this.creeperSpecialParticles();
+            this.creeperSpecialParticles(); 
         }
 //Else immediately shut down special swell
         else
@@ -237,7 +233,7 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
         Entity selfEntity = (Entity) (Object) this;
 
         selfEntity.world.playSound(null, atX, atY, atZ,
-        PrimitiveMobsSoundEvents.ENTITY_CREEPER_NUKE, SoundCategory.NEUTRAL, 3.0F, 1.0F);
+        EternityModeSoundEvents.ENTITY_CREEPER_NUKE, SoundCategory.HOSTILE, 3.0F, 1.0F);
     }
 
     public void creeperSpecialParticles()

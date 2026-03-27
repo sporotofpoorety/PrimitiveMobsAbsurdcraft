@@ -7,13 +7,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
 
-import net.daveyx0.multimob.client.particle.MMParticles;
-import net.daveyx0.multimob.entity.IMultiMob;
-import net.daveyx0.multimob.message.MMMessageRegistry;
-import net.daveyx0.multimob.message.MessageMMParticle;
-import net.daveyx0.multimob.util.EntityUtil;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
@@ -50,6 +43,19 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ISpecialArmor;
+
+import net.daveyx0.multimob.client.particle.MMParticles;
+import net.daveyx0.multimob.entity.IMultiMob;
+import net.daveyx0.multimob.message.MMMessageRegistry;
+import net.daveyx0.multimob.message.MessageMMParticle;
+import net.daveyx0.multimob.util.EntityUtil;
+
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
+
+
+
 
 public class EntityBrainSlime extends EntitySlime implements IMultiMob {
 
@@ -667,7 +673,7 @@ public class EntityBrainSlime extends EntitySlime implements IMultiMob {
                          {
                              if (this.slime.makesSoundOnJump())
                              {
-                                 this.slime.playSound(PrimitiveMobsSoundEvents.ENTITY_BRAINSLIME_CHARGE, this.slime.getSoundVolume(), ((this.slime.getRNG().nextFloat() - this.slime.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
+                                 this.slime.playSound(EternityModeSoundEvents.ENTITY_BRAINSLIME_CHARGE, this.slime.getSoundVolume(), ((this.slime.getRNG().nextFloat() - this.slime.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
                              }
                         	 this.performChargeAttack();
                          }

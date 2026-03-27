@@ -1,11 +1,16 @@
 package net.daveyx0.primitivemobs.entity.ai;
 
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.util.SoundCategory;
+
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
+
+
+
 
 public class EntityAICreeperSwellSpecial extends EntityAIBase
 {
@@ -116,9 +121,9 @@ public class EntityAICreeperSwellSpecial extends EntityAIBase
 //Give up and reactivate cooldown
             this.swellingCreeperMixin.setCreeperSpecialCooldown(this.swellingCreeperMixin.getCreeperSpecialCooldownFrustrated());
             this.swellingCreeperMixin.setCreeperSpecialInterrupted(0);
-            //this.swellingCreeper.playSound(PrimitiveMobsSoundEvents.ENTITY_CREEPER_ANNOYED, 3.0F, 1.0F);
+            //this.swellingCreeper.playSound(EternityModeSoundEvents.ENTITY_CREEPER_ANNOYED, 3.0F, 1.0F);
             this.swellingCreeper.world.playSound(null, this.swellingCreeper.posX, this.swellingCreeper.posY, this.swellingCreeper.posZ, 
-            PrimitiveMobsSoundEvents.ENTITY_CREEPER_ANNOYED, SoundCategory.NEUTRAL, 2.0F, 1.0F);
+            EternityModeSoundEvents.ENTITY_CREEPER_ANNOYED, SoundCategory.NEUTRAL, 2.0F, 1.0F);
         }
 //For regular interruptions has smaller cooldown
         else

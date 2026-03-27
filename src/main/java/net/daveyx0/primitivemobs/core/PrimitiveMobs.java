@@ -22,9 +22,10 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = PrimitiveMobsReference.MODID, name = PrimitiveMobsReference.NAME, version = PrimitiveMobsReference.VERSION, acceptedMinecraftVersions = "[1.12]",	
-		guiFactory = "net.daveyx0.primitivemobs.config.PrimitiveMobsFactoryGui", dependencies= "required-after:cleanroom@[0.3.27-alpha,);required-after:mixinbooter@[10.1,);required-after:multimob;required-after:eternitymode")
+		guiFactory = "net.daveyx0.primitivemobs.config.PrimitiveMobsFactoryGui", dependencies= "required-after:mixinbooter@[10.1,);required-after:multimob;required-after:eternitymode")
 
-public class PrimitiveMobs {
+public class PrimitiveMobs 
+{
 
 	public static final Logger LOGGER = LogManager.getLogger(PrimitiveMobsReference.MODID);
 

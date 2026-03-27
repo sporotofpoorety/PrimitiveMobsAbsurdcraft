@@ -1,11 +1,8 @@
 package net.daveyx0.primitivemobs.entity.monster;
 
-import net.daveyx0.multimob.common.capabilities.CapabilityTameableEntity;
-import net.daveyx0.multimob.common.capabilities.ITameableEntity;
-import net.daveyx0.multimob.util.EntityUtil;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
+
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
@@ -14,6 +11,17 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
+
+import net.daveyx0.multimob.common.capabilities.CapabilityTameableEntity;
+import net.daveyx0.multimob.common.capabilities.ITameableEntity;
+import net.daveyx0.multimob.util.EntityUtil;
+
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
+
+
+
 
 public class EntityPrimitiveCreeper extends EntityCreeper
 {
@@ -62,6 +70,7 @@ public class EntityPrimitiveCreeper extends EntityCreeper
         super.onUpdate();
     }
 
+
     /**
      * Called when the entity is attacked.
      */
@@ -76,11 +85,22 @@ public class EntityPrimitiveCreeper extends EntityCreeper
         return super.attackEntityFrom(source, amount);
     }
     
+
     protected void entityInit()
     {
         super.entityInit();
         this.dataManager.register(BABY, Boolean.valueOf(false));
     }
+
+
+    protected void applyEntityAttributes()
+    {
+        super.applyEntityAttributes();
+//Special attacks did nothing with 16 follow range
+        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0D);
+    }
+
+
 
     /**
      * The age value may be negative or positive or zero. If it's negative, it get's incremented on each tick, if it's

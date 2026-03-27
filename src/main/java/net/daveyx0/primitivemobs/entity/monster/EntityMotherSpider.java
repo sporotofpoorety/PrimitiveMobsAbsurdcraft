@@ -2,12 +2,6 @@ package net.daveyx0.primitivemobs.entity.monster;
 
 import javax.annotation.Nullable;
 
-import net.daveyx0.multimob.entity.IMultiMob;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigMobs;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.entity.ai.EntityAIFollowerHurtByTarget;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
@@ -36,6 +30,18 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
+
+import net.daveyx0.multimob.entity.IMultiMob;
+
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigMobs;
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
+import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
+import net.daveyx0.primitivemobs.entity.ai.EntityAIFollowerHurtByTarget;
+
+
+
 
 public class EntityMotherSpider extends EntityPrimitiveSpider implements IMultiMob {
 
@@ -83,6 +89,9 @@ public class EntityMotherSpider extends EntityPrimitiveSpider implements IMultiM
 	
 	public void onUpdate()
 	{
+		super.onUpdate();
+
+
 		if(!this.getPassengers().isEmpty())
 		{
 	        if (this.getPassengers().get(0) instanceof EntityBabySpider)
@@ -118,7 +127,7 @@ public class EntityMotherSpider extends EntityPrimitiveSpider implements IMultiM
     
     protected SoundEvent getHurtSound(DamageSource p_184601_1_)
     {
-        return PrimitiveMobsSoundEvents.ENTITY_MOTHERSPIDER_SCREECH;
+        return EternityModeSoundEvents.ENTITY_MOTHERSPIDER_SCREECH;
     }
     
     public void addFollower(EntityLivingBase follower)

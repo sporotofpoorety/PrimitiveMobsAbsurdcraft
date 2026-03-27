@@ -4,16 +4,6 @@ import java.util.Collection;
 
 import javax.annotation.Nullable;
 
-import net.daveyx0.multimob.common.capabilities.CapabilityTameableEntity;
-import net.daveyx0.multimob.common.capabilities.ITameableEntity;
-import net.daveyx0.multimob.entity.IMultiMob;
-import net.daveyx0.multimob.util.EntityUtil;
-import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
-import net.daveyx0.primitivemobs.core.PrimitiveMobsSoundEvents;
-import net.daveyx0.primitivemobs.core.TaskUtils;
-import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -49,6 +39,20 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+
+import net.daveyx0.multimob.common.capabilities.CapabilityTameableEntity;
+import net.daveyx0.multimob.common.capabilities.ITameableEntity;
+import net.daveyx0.multimob.entity.IMultiMob;
+import net.daveyx0.multimob.util.EntityUtil;
+
+import org.sporotofpoorety.eternitymode.client.ExplosiveHandler;
+import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+
+import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
+import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
+import net.daveyx0.primitivemobs.core.TaskUtils;
+import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
+import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 
 
 
@@ -325,8 +329,6 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
         super.applyEntityAttributes();
 //Was originally 0.35D but it felt a bit too fast
         this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3D);
-//Special attack did nothing with 16 follow range
-        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0D);
     }
     
     protected void entityInit()
@@ -377,14 +379,17 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
 
     public boolean hasEnoughSpaceToJump(Entity entityIn)
     {
-    	boolean flag = true;
-    	if (!this.alwaysJumps) {
-	    	for(int i = 0; i < 5; i++)
+    	boolean fromAllHeights = true;
+
+    	if (!this.alwaysJumps) 
+        {
+	    	for(int rayElevation = 0; rayElevation < 5; rayElevation++)
 	    	{
-	    		flag = this.world.rayTraceBlocks(new Vec3d(this.posX, this.posY + (double)this.getEyeHeight() + i, this.posZ), new Vec3d(entityIn.posX, entityIn.posY + (double)entityIn.getEyeHeight(), entityIn.posZ), false, true, false) == null;
+	    		fromAllHeights = this.world.rayTraceBlocks(new Vec3d(this.posX, this.posY + (double)this.getEyeHeight() + rayElevation, this.posZ), new Vec3d(entityIn.posX, entityIn.posY + (double)entityIn.getEyeHeight(), entityIn.posZ), false, true, false) == null;
 	    	}
     	}
-        return flag;
+
+        return fromAllHeights;
     }
     
     public void onUpdate()
@@ -426,7 +431,7 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
 //Jump start sound
                         this.world.playSound(null, 
                         rocketCreeperAttackTarget.posX, rocketCreeperAttackTarget.posY, rocketCreeperAttackTarget.posZ,
-                        SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.NEUTRAL, 3.0F, 0.5F);
+                        SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.HOSTILE, 3.0F, 0.5F);
 
 //Adjust to target height
                         double targetHeightFactor = 1.0D;
@@ -476,7 +481,7 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
 
                         this.world.playSound(null, 
                         rocketCreeperAttackTarget.posX, rocketCreeperAttackTarget.posY, rocketCreeperAttackTarget.posZ,
-                        SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.NEUTRAL, 3.0F, 0.5F);
+                        SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.HOSTILE, 3.0F, 0.5F);
 
                         this.prepareTicks = 0;
                         this.setCreeperPreparing(false);
@@ -649,31 +654,59 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
 
         this.world.playSound(null, 
         rocketCreeperAttackTarget.posX, rocketCreeperAttackTarget.posY, rocketCreeperAttackTarget.posZ,
-        PrimitiveMobsSoundEvents.ENTITY_CREEPER_NUKE, SoundCategory.NEUTRAL, 3.0F, 1.0F);
+        EternityModeSoundEvents.ENTITY_CREEPER_NUKE, SoundCategory.HOSTILE, 3.0F, 1.0F);
     }
 
     public void creeperSpecialParticles()
     {
         if(this.getCreeperHoming())
         {
-/*
-            this.world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, this.posX, this.posY, this.posZ, 
-            0.0D, 0.0D, 0.0D);
-*/
+            if(this.ticksExisted % 2 == 0)
+            {
+//Particles behind homing direction
+                double atX = this.posX + (this.motionX * -0.2D);
+                double atY = this.posY + (this.height / 2.0D) + (this.motionY * -0.2D);
+                double atZ = this.posZ + (this.motionZ * -0.2D);
+
+                ExplosiveHandler.spawnParticles(this.world, atX, atY, atZ,
+                    1.0F, false, false);
+            }
         }
         else if(this.getCreeperPreparing())
         {
-            if(!(this.getCreeperPreparingIsPastFirstTick()))
+            if(this.ticksExisted % 2 == 0)
             {
-
+//Particles below when jumping
+                ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
+                    1.0F, false, false);
             }
 
-            this.world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, this.posX, this.posY, this.posZ, 
-            this.getRNG().nextGaussian(), -0.5D, this.getRNG().nextGaussian());
+//Inital burst when jumping
+            if(!(this.getCreeperPreparingIsPastFirstTick()))
+            {
+                ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
+                    6.0F, false, false);
+            }
         }
         else
         {
-        
+//Particles around for clear warning sign
+            if(this.ticksExisted % 2 == 0)
+            {
+                double atX = this.posX + (3.0D * (rand.nextDouble() - rand.nextDouble()));
+                double atY = this.posY + (22.0D * rand.nextDouble());
+                double atZ = this.posZ + (3.0D * (rand.nextDouble() - rand.nextDouble()));
+
+                ExplosiveHandler.spawnParticles(this.world, atX, atY, atZ,
+                    1.0F, false, false);
+            }
+
+//And below as a small touch
+            if(this.ticksExisted % 10 == 0)
+            {
+                ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
+                    1.0F, false, false);
+            }             
         }
     }
 
