@@ -12,8 +12,10 @@ public class EntityAISwitchBetweenRangedAndMelee extends EntityAIAttackMelee
 	private final EntitySkeleton entity;
 	private final double moveSpeedAmp;
 	private int attackCooldown;
-//Sets outer bound distances that force strafe pattern
+
+//Sets outer bound distance that activates strafe pattern
 	private final float maxAttackDistance;
+
     private final int useTimeNeeded;
 	private int attackTime = -1;
 	private int seeTime;

@@ -195,14 +195,15 @@ import net.minecraft.world.World;
                     ++this.attackStep;
                     visualState -= 0.05f;
 
-//Preparation, some ticks between setting on fire and actually attacking
+
+//Preparation right before attack
                     if (this.attackStep == 1)
                     {
                         this.spewer.nextActionCountdown = this.goVulnerableWhen;
                         this.spewer.setOnFire(true);
                         this.spewer.setReadyToShoot(true);
                     }
-//Main shot delay logic
+//Delay after each shot
                     else if (this.attackStep <= this.attackRapidfireShots)
                     {
                         this.spewer.nextActionCountdown = this.attackRapidfireInterval;

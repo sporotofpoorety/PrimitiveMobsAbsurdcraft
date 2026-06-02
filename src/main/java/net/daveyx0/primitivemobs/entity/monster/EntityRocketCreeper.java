@@ -659,54 +659,57 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
 
     public void creeperSpecialParticles()
     {
-        if(this.getCreeperHoming())
+        if(this.world.isRemote)
         {
-            if(this.ticksExisted % 2 == 0)
+            if(this.getCreeperHoming())
             {
+                if(this.ticksExisted % 2 == 0)
+                {
 //Particles behind homing direction
-                double atX = this.posX + (this.motionX * -0.2D);
-                double atY = this.posY + (this.height / 2.0D) + (this.motionY * -0.2D);
-                double atZ = this.posZ + (this.motionZ * -0.2D);
+                    double atX = this.posX + (this.motionX * -0.2D);
+                    double atY = this.posY + (this.height / 2.0D) + (this.motionY * -0.2D);
+                    double atZ = this.posZ + (this.motionZ * -0.2D);
 
-                ExplosiveHandler.spawnParticles(this.world, atX, atY, atZ,
-                    1.0F, false, false);
+                    ExplosiveHandler.spawnParticles(this.world, atX, atY, atZ,
+                        1.0F, false, false);
+                }
             }
-        }
-        else if(this.getCreeperPreparing())
-        {
-            if(this.ticksExisted % 2 == 0)
+            else if(this.getCreeperPreparing())
             {
+                if(this.ticksExisted % 2 == 0)
+                {
 //Particles below when jumping
-                ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
-                    1.0F, false, false);
-            }
+                    ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
+                        1.0F, false, false);
+                }
 
 //Inital burst when jumping
-            if(!(this.getCreeperPreparingIsPastFirstTick()))
-            {
-                ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
-                    6.0F, false, false);
+                if(!(this.getCreeperPreparingIsPastFirstTick()))
+                {
+                    ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
+                        6.0F, false, false);
+                }
             }
-        }
-        else
-        {
+            else
+            {
 //Particles around for clear warning sign
-            if(this.ticksExisted % 2 == 0)
-            {
-                double atX = this.posX + (3.0D * (rand.nextDouble() - rand.nextDouble()));
-                double atY = this.posY + (22.0D * rand.nextDouble());
-                double atZ = this.posZ + (3.0D * (rand.nextDouble() - rand.nextDouble()));
+                if(this.ticksExisted % 2 == 0)
+                {
+                    double atX = this.posX + (3.0D * (rand.nextDouble() - rand.nextDouble()));
+                    double atY = this.posY + (22.0D * rand.nextDouble());
+                    double atZ = this.posZ + (3.0D * (rand.nextDouble() - rand.nextDouble()));
 
-                ExplosiveHandler.spawnParticles(this.world, atX, atY, atZ,
-                    1.0F, false, false);
-            }
+                    ExplosiveHandler.spawnParticles(this.world, atX, atY, atZ,
+                        1.0F, false, false);
+                }
 
 //And below as a small touch
-            if(this.ticksExisted % 10 == 0)
-            {
-                ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
-                    1.0F, false, false);
-            }             
+                if(this.ticksExisted % 10 == 0)
+                {
+                    ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
+                        1.0F, false, false);
+                }             
+            }
         }
     }
 

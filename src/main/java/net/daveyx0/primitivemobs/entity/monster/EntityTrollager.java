@@ -536,16 +536,26 @@ public class EntityTrollager extends EntityMob implements IAnimatedMob, IMultiMo
 		{
 		    case 0:
 		    {
-                EntityThrownBlock thrownBlock = new EntityThrownBlock(this.world, this.posX, this.posY + 4.0D, this.posZ, 
-                    this, this.world.getBlockState(this.getThrownBlock()), 
-                    true, false, true, 10.0F);
-//	            thrownBlock.setLocationAndAngles(this.posX, this.posY + 4.0D, this.posZ, this.rotationYaw, 0.0F);
-                thrownBlock.setMovement((target.posX - thrownBlock.posX) / 18D, (target.posY - thrownBlock.posY) / 18D + 0.5D, (target.posZ - thrownBlock.posZ) / 18D, 
-                0.04D, false, 0.98D);
+                if(this.getThrownBlock() != null)
+                {
+//Initialize basis block and state
+                    EntityThrownBlock thrownBlock = new EntityThrownBlock(this.world, 
+                        this.getThrownBlock().getX() + 0.5D, this.getThrownBlock().getY() + 0.5D, this.getThrownBlock().getZ() + 0.5D, 
+                        this, this.world.getBlockState(this.getThrownBlock()), 
+                        true, false, true, 10.0F);
+//Set manual origin
+                    thrownBlock.hasManualOrigin = true;
+//And not destroy initial pos
+                    thrownBlock.dontBreakInitialPos = true;
+//Then give proper pos before spawning
+	                thrownBlock.setLocationAndAngles(this.posX, this.posY + 4.0D, this.posZ, this.rotationYaw, 0.0F);
+                    thrownBlock.setMovement((target.posX - thrownBlock.posX) / 18D, (target.posY - thrownBlock.posY) / 18D + 0.5D, (target.posZ - thrownBlock.posZ) / 18D, 
+                    0.04D, false, 0.98D);
 
 
-	            this.getEntityWorld().spawnEntity(thrownBlock);
-	            this.playSound(EternityModeSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
+	                this.getEntityWorld().spawnEntity(thrownBlock);
+	                this.playSound(EternityModeSoundEvents.ENTITY_TROLLAGER_ATTACK, this.getSoundVolume(), ((this.getRNG().nextFloat() - this.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
+                }
 	            break;
 		    }
 

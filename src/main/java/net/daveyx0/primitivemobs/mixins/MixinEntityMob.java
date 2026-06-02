@@ -36,7 +36,7 @@ import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityMob;
 //Mixin this class
 @Mixin(value = EntityMob.class, remap = true)
 //Abstract since mixins should not be instantiated
-public abstract class MixinEntityMob implements IMixinEntityMob
+public abstract class MixinEntityMob implements IMixinEntityMob, IMixinEntityLiving
 {
 
 //Operation
@@ -145,16 +145,9 @@ public abstract class MixinEntityMob implements IMixinEntityMob
 //If attacked in the middle of the swell
                 if(selfCreeperMixin.getCreeperStateSpecial() > 0)
                 {
-                    Entity selfEntity = (Entity) (Object) this;
-                    EntityCreeper selfEntityCreeper = (EntityCreeper) (Object) this;
-//Play sound
-                    selfEntity.playSound(EternityModeSoundEvents.ENTITY_DIZZY, 3.0F, 1.0F);
-//Apply special cooldown
-                    selfCreeperMixin.setCreeperSpecialCooldown(selfCreeperMixin.getCreeperSpecialCooldownStunned());
-//And apply stun
+//Apply stun
                     IMixinEntityLiving selfEntityLivingMixin = (IMixinEntityLiving) (Object) this;
-                    selfEntityLivingMixin.setAbsurdcraftStunned(true);
-                    selfEntityLivingMixin.setAbsurdcraftStunnedTimer(selfCreeperMixin.getCreeperSpecialStunnedDuration());
+                    selfEntityLivingMixin.setAbsurdcraftStunned(true, selfCreeperMixin.getCreeperSpecialStunnedDuration());
                 }
 //If just attacked normally there's a smaller cooldown 
                 else

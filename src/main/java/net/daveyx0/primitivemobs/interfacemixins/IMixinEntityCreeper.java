@@ -1,8 +1,9 @@
 package net.daveyx0.primitivemobs.interfacemixins;
 
 import org.sporotofpoorety.eternitymode.entity.ai.EntityAIStun;
+import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityLiving;
 
-public interface IMixinEntityCreeper
+public interface IMixinEntityCreeper extends IMixinEntityLiving
 {
 
     boolean creeperSpecialConditions();

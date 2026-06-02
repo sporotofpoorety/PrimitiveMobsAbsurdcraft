@@ -206,6 +206,13 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
     }
 
 
+    @Override
+    public void onAbsurdcraftStunnedExtra() 
+    {
+        this.setCreeperSpecialCooldown(this.getCreeperSpecialCooldownStunned());
+    }
+
+
 //New misc methods
 
 
