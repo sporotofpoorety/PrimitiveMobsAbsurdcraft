@@ -95,9 +95,11 @@ public abstract class MixinEntityCreeper implements IMixinEntityCreeper
         this.creeperSpecialInterruptedDamage = 69420;
 
 
+/*
 //Add stunned task
         EntityLiving selfEntityLiving = (EntityLiving) (Object) this;
-        selfEntityLiving.tasks.addTask(0, new EntityAIStun(selfEntityLiving));        
+        selfEntityLiving.tasks.addTask(0, new EntityAIStun(selfEntityLiving));  
+*/      
     }
 
 

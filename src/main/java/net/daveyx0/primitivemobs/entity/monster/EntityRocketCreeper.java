@@ -659,7 +659,7 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
 
     public void creeperSpecialParticles()
     {
-        if(this.world.isRemote)
+        if(!this.world.isRemote)
         {
             if(this.getCreeperHoming())
             {
@@ -692,6 +692,7 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
             }
             else
             {
+/*
 //Particles around for clear warning sign
                 if(this.ticksExisted % 2 == 0)
                 {
@@ -702,6 +703,17 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
                     ExplosiveHandler.spawnParticles(this.world, atX, atY, atZ,
                         1.0F, false, false);
                 }
+*/
+//Particles above for clear warning sign
+                if(this.ticksExisted % 10 == 0)
+                {
+                    for(int warnHeight = 0; warnHeight <= 4; warnHeight++)
+                    {
+                        ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY + 4.0D + (5.0D * warnHeight), this.posZ,
+                            1.0F, false, false);
+                    }
+                }
+
 
 //And below as a small touch
                 if(this.ticksExisted % 10 == 0)

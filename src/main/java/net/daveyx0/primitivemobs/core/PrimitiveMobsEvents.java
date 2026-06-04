@@ -67,12 +67,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 
-import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityLiving;
 
 
-
-
-public class PrimitiveMobsEvents {
+public class PrimitiveMobsEvents 
+{
 
 
 @Mod.EventBusSubscriber(modid = PrimitiveMobsReference.MODID)
@@ -328,18 +326,9 @@ public static class EntityEventHandler {
 	            }
 
 //ANTI-RECURSION GUARD HERE
-//If TARGET not null
+//If target not ALREADY null
                 if(event.getTarget() != null)
                 {
-//Let's see if this actually makes the stun work
-                    IMixinEntityLiving selfEntityLivingMixin = (IMixinEntityLiving) (Object) living;
-//Can't target anything if stunned
-                    if(selfEntityLivingMixin.getAbsurdcraftStunned())
-                    {
-	                    living.setAttackTarget(null);
-                    }
-   
-		            
 //Reworked camouflage armor
 //(Hopefully functional this time lol)
 		            if(event.getTarget() != null && event.getTarget() instanceof EntityPlayer && event.getEntityLiving() instanceof EntityLiving)
