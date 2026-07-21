@@ -17,8 +17,7 @@ import net.daveyx0.multimob.common.capabilities.ITameableEntity;
 import net.daveyx0.multimob.util.EntityUtil;
 
 import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
-
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
+import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityCreeper;
 
 
 

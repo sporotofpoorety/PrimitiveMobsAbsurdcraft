@@ -6,8 +6,7 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.util.SoundCategory;
 
 import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
-
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
+import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityCreeper;
 
 
 

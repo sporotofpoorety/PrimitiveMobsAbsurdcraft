@@ -12,7 +12,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.util.ClassInheritanceMultiMap;
 
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityMob;
+import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityMob;
 
 
 public final class EntitiesWithinChunks

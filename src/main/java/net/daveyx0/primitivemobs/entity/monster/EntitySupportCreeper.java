@@ -46,6 +46,7 @@ import net.daveyx0.multimob.util.EntityUtil;
 
 import org.sporotofpoorety.eternitymode.client.particles.ParticleSpiral; 
 import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityCreeper;
 import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityLiving;
 
 import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
@@ -53,12 +54,12 @@ import net.daveyx0.primitivemobs.core.EntitiesWithinChunks;
 import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
 import net.daveyx0.primitivemobs.core.TaskUtils;
 import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 
 
 
 
-public class EntitySupportCreeper extends EntityPrimitiveCreeper {
+public class EntitySupportCreeper extends EntityPrimitiveCreeper 
+{
 
 //Access getters and setters of EntityCreeper mixin
     public IMixinEntityCreeper supportCreeperMixin;

@@ -34,6 +34,7 @@ import net.daveyx0.multimob.entity.IMultiMob;
 import net.daveyx0.multimob.entity.ai.EntityAIBackOffFromEntity;
 
 import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityCreeper;
 import org.sporotofpoorety.eternitymode.util.FireworkUtil;
 
 import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
@@ -41,7 +42,6 @@ import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
 import net.daveyx0.primitivemobs.core.TaskUtils;
 import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
 import net.daveyx0.primitivemobs.entity.item.EntityPrimitiveTNTPrimed;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 
 
 

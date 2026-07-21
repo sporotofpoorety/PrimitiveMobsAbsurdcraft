@@ -45,14 +45,15 @@ import net.daveyx0.multimob.common.capabilities.ITameableEntity;
 import net.daveyx0.multimob.entity.IMultiMob;
 import net.daveyx0.multimob.util.EntityUtil;
 
-import org.sporotofpoorety.eternitymode.client.ExplosiveHandler;
 import org.sporotofpoorety.eternitymode.core.EternityModeSoundEvents;
+import org.sporotofpoorety.eternitymode.interfacemixins.IMixinEntityCreeper;
+import org.sporotofpoorety.eternitymode.packets.ExplosionVisualPacket;
+import org.sporotofpoorety.eternitymode.util.PacketUtil;
 
 import net.daveyx0.primitivemobs.config.PrimitiveMobsConfigSpecial;
 import net.daveyx0.primitivemobs.core.PrimitiveMobsLootTables;
 import net.daveyx0.primitivemobs.core.TaskUtils;
 import net.daveyx0.primitivemobs.entity.ai.EntityAICreeperSwellSpecial;
-import net.daveyx0.primitivemobs.interfacemixins.IMixinEntityCreeper;
 
 
 
@@ -670,8 +671,8 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
                     double atY = this.posY + (this.height / 2.0D) + (this.motionY * -0.2D);
                     double atZ = this.posZ + (this.motionZ * -0.2D);
 
-                    ExplosiveHandler.spawnParticles(this.world, atX, atY, atZ,
-                        1.0F, false, false);
+                    PacketUtil.sendPacketToNearbyPlayers(this.world, atX, atY, atZ, 999.0D, 
+                        new ExplosionVisualPacket(2, atX, atY, atZ, 1.0F, false));
                 }
             }
             else if(this.getCreeperPreparing())
@@ -679,38 +680,26 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
                 if(this.ticksExisted % 2 == 0)
                 {
 //Particles below when jumping
-                    ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
-                        1.0F, false, false);
+                    PacketUtil.sendPacketToNearbyPlayers(this.world, this.posX, this.posY, this.posZ, 999.0D, 
+                        new ExplosionVisualPacket(2, this.posX, this.posY, this.posZ, 1.0F, false));
                 }
 
 //Inital burst when jumping
                 if(!(this.getCreeperPreparingIsPastFirstTick()))
                 {
-                    ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
-                        6.0F, false, false);
+                    PacketUtil.sendPacketToNearbyPlayers(this.world, this.posX, this.posY, this.posZ, 999.0D, 
+                        new ExplosionVisualPacket(2, this.posX, this.posY, this.posZ, 6.0F, false));
                 }
             }
             else
             {
-/*
-//Particles around for clear warning sign
-                if(this.ticksExisted % 2 == 0)
-                {
-                    double atX = this.posX + (3.0D * (rand.nextDouble() - rand.nextDouble()));
-                    double atY = this.posY + (22.0D * rand.nextDouble());
-                    double atZ = this.posZ + (3.0D * (rand.nextDouble() - rand.nextDouble()));
-
-                    ExplosiveHandler.spawnParticles(this.world, atX, atY, atZ,
-                        1.0F, false, false);
-                }
-*/
 //Particles above for clear warning sign
                 if(this.ticksExisted % 10 == 0)
                 {
                     for(int warnHeight = 0; warnHeight <= 4; warnHeight++)
                     {
-                        ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY + 4.0D + (5.0D * warnHeight), this.posZ,
-                            1.0F, false, false);
+                        PacketUtil.sendPacketToNearbyPlayers(this.world, this.posX, this.posY + 4.0D + (5.0D * warnHeight), this.posZ, 999.0D, 
+                            new ExplosionVisualPacket(2, this.posX, this.posY + 4.0D + (5.0D * warnHeight), this.posZ, 1.0F, false));
                     }
                 }
 
@@ -718,8 +707,8 @@ public class EntityRocketCreeper extends EntityPrimitiveCreeper implements IMult
 //And below as a small touch
                 if(this.ticksExisted % 10 == 0)
                 {
-                    ExplosiveHandler.spawnParticles(this.world, this.posX, this.posY, this.posZ,
-                        1.0F, false, false);
+                    PacketUtil.sendPacketToNearbyPlayers(this.world, this.posX, this.posY, this.posZ, 999.0D, 
+                        new ExplosionVisualPacket(2, this.posX, this.posY, this.posZ, 1.0F, false));
                 }             
             }
         }
